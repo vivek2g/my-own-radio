@@ -133,3 +133,34 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   (link-out rather than re-host). Re-verify terms at that time — they change.
 - **Why recorded now:** So nobody designs the radio around a music source that
   isn't actually permitted.
+
+## 11. Typefaces: Newsreader (reading) + Inter (UI); "quiet editorial" design
+
+- **Status:** Accepted.
+- **Decision:** Use **Newsreader** as the reading serif (headings and body) and
+  **Inter** for small UI text (nav, dates, labels). The overall design language
+  is "quiet editorial": typography-led, a single centered reading column (~66
+  characters), a fluid type scale, hairline rules, letter-spaced uppercase date
+  "kickers", an italic standfirst under post titles, and a drop cap on each
+  post's opening paragraph.
+- **Why:** The site is reading-first; type carries the look. Newsreader reads as
+  modern-yet-literary and is designed for screens (stays crisp phone→desktop);
+  Inter is a neutral, legible companion for interface text. A centered measure
+  plus fluid sizing (`clamp()`) is what makes the layout hold identically across
+  desktop, iPad, and mobile without breakpoint jumps.
+- **Alternatives considered:** EB Garamond (more classic/old-world but more
+  delicate at small sizes on low-res screens); Spectral (contemporary, a touch
+  cooler). Both were rendered and compared before choosing Newsreader.
+
+## 12. Font delivery via Google Fonts now; self-hosting is a later option
+
+- **Status:** Provisional.
+- **Decision:** Load Newsreader and Inter from Google Fonts via a `<link>` in
+  `BaseLayout`, with `preconnect` and `display=swap`.
+- **Why:** Zero setup and good-enough performance to ship. `display=swap`
+  avoids invisible text while the font loads; `preconnect` starts the fetch
+  early.
+- **Trade-off / when to revisit:** Self-hosting the fonts (e.g. via Fontsource)
+  would be faster and more private (no third-party request) at the cost of a
+  build dependency and a few KB in the repo. Revisit if font loading becomes a
+  measured performance or privacy concern.
