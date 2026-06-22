@@ -3,7 +3,7 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer font-ui">
-  <div class="container">
+  <div class="foot">
     <p class="muted">
       &copy; {year} My Own Radio &middot; Written by Vivek Kumar.
     </p>
@@ -16,5 +16,8 @@ const year = new Date().getFullYear();
     margin-top: 4rem;
     padding-block: 2rem;
     font-size: 0.9rem;
+  }
+  .foot {
+    padding-inline: clamp(1.1rem, 4vw, 2.75rem);
   }
 </style>

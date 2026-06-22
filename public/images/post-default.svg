@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="My Own Radio">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eceae5"/>
+      <stop offset="1" stop-color="#ddd9d2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="1180" cy="300" r="92" fill="none" stroke="#c9c3b8" stroke-width="3"/>
+  <circle cx="1180" cy="300" r="10" fill="#bdb6aa"/>
+  <line x1="1180" y1="300" x2="1248" y2="232" stroke="#c9c3b8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M0 640 L300 470 L520 640 Z" fill="#c6c1b6"/>
+  <path d="M360 640 L700 410 L1010 640 Z" fill="#b4aea2"/>
+  <path d="M820 640 L1140 450 L1480 640 Z" fill="#c6c1b6"/>
+  <path d="M-20 700 L320 520 L640 700 Z" fill="#9c968a"/>
+  <path d="M520 720 L980 470 L1480 720 Z" fill="#8f897d"/>
+  <rect y="640" width="1600" height="260" fill="#7e786c"/>
+  <path d="M360 640 L700 410 L760 455 L470 640 Z" fill="#e7e3db" fill-opacity="0.5"/>
+  <path d="M820 640 L1140 450 L1200 495 L960 640 Z" fill="#e7e3db" fill-opacity="0.45"/>
+</svg>
