@@ -1,0 +1,145 @@
+---
+// The homepage hero: a full-bleed photo that fades and lifts away as you
+// scroll, handing off to the reading view below.
+//
+// Drop your photo at: public/images/hero.jpg
+// (any wide landscape photo works; see public/images/README.md)
+//
+// Props let you reuse this with different text later if you want.
+interface Props {
+  title?: string;
+  tagline?: string;
+  image?: string;
+}
+const {
+  title = 'My Own Radio',
+  tagline = 'Notes from the trail and from the mind — treks, travel, and a slow inquiry into who I am.',
+  image = '/images/hero.jpg',
+} = Astro.props;
+---
+
+<section class="hero" style={`--hero-image: url('${image}')`}>
+  <div class="hero__scrim"></div>
+  <div class="hero__content">
+    <h1 class="hero__title">{title}</h1>
+    <p class="hero__tagline">{tagline}</p>
+  </div>
+  <div class="hero__cue" aria-hidden="true">
+    <span>scroll</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: min(88svh, 760px);
+    /* Fallback neutral color shows if the photo hasn't been added yet. */
+    background-color: #3a3833;
+    background-image: var(--hero-image);
+    background-size: cover;
+    /* Focal point: keeps the peak and a standing figure in frame when cropped. */
+    background-position: center 42%;
+    display: flex;
+    align-items: flex-end; /* title sits low-left */
+    overflow: hidden;
+  }
+
+  /* The scrim: a soft dark wash, heaviest at the bottom, so light text stays
+     readable over any photo. */
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(20, 18, 14, 0.15) 0%,
+      rgba(20, 18, 14, 0) 35%,
+      rgba(20, 18, 14, 0.55) 100%
+    );
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    padding: 0 1.5rem 3.5rem;
+    max-width: var(--max-width);
+    margin-inline: auto;
+    width: 100%;
+  }
+  .hero__title {
+    font-family: var(--font-body);
+    color: #fbf7ef;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    margin: 0 0 0.6rem;
+    line-height: 1.1;
+  }
+  .hero__tagline {
+    font-family: var(--font-ui);
+    color: #ece4d6;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    max-width: 32rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .hero__cue {
+    position: absolute;
+    z-index: 1;
+    bottom: 1.1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    color: #ece4d6;
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: nudge 2.4s ease-in-out infinite;
+  }
+
+  @keyframes nudge {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(4px); }
+  }
+
+  /* Shorter hero on phones so some writing peeks above the fold. */
+  @media (max-width: 600px) {
+    .hero { height: 72svh; }
+  }
+
+  /* Respect people who ask their system to reduce motion: no nudging, and the
+     scroll-fade script below also bails out. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero__cue { animation: none; }
+  }
+</style>
+
+<script>
+  // Gentle fade + lift as the hero scrolls out of view. Pure progressive
+  // enhancement: if JS is off or reduced-motion is on, the hero just scrolls
+  // away normally.
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const content = hero?.querySelector<HTMLElement>('.hero__content');
+
+  if (hero && content && !prefersReduced) {
+    let ticking = false;
+    const update = () => {
+      const h = hero.offsetHeight;
+      const progress = Math.min(window.scrollY / h, 1);
+      content.style.opacity = String(1 - progress * 1.4);
+      content.style.transform = `translateY(${progress * 40}px)`;
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+    update();
+  }
+</script>

@@ -1,0 +1,34 @@
+---
+title: "Why I'm starting My Own Radio"
+description: "A first note on what this journal is, and the question underneath it."
+pubDate: 2026-06-20
+tags: ["meta", "philosophy"]
+draft: false
+---
+
+This is the first entry, so it should say what the thing is.
+
+My Own Radio starts as a journal. I want a single place to write down two
+streams of my life that turn out to be the same stream: the treks and travels I
+keep returning to, and a slower question I can't put down — who am I, and what is
+this for. I want to ask it honestly, using Hinduism first because it's mine, but
+also other traditions and plain philosophy where they help.
+
+> The unexamined life is not worth living.
+
+That line is Socrates, by way of Plato's *Apology*. I don't fully agree with it —
+plenty of unexamined lives are worth a great deal — but I keep the sentiment: I'd
+rather examine mine than not.
+
+## What you'll find here
+
+Trip notes from the mountains. Half-formed arguments with myself. Passages I'm
+reading and what they did to me. Some of it will be wrong and I'll leave it up
+anyway, because a journal that only records conclusions isn't honest about how
+thinking actually goes.
+
+## Where this is going
+
+Later, this becomes something you can listen to as well as read — a small,
+personal radio. But that's a problem for a future entry. For now: write first,
+build the machine around the writing second.

@@ -1,0 +1,86 @@
+---
+// Home page. Shows a short intro and the most recent posts.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+);
+const recent = posts.slice(0, 5);
+---
+
+<BaseLayout title="My Own Radio">
+  <Hero />
+
+  <div class="container home-body">
+    <section class="intro">
+      <p class="lede">
+        A journal of treks and travels, and a slow inquiry into who I am and what
+        this is all for &mdash; drawn from Hinduism, other traditions, and
+        philosophy.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="font-ui section-title">Latest from the journal</h2>
+      {recent.length === 0 ? (
+        <p class="muted">No posts yet. The first one is on its way.</p>
+      ) : (
+        <ul class="post-list">
+          {recent.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}/`} class="post-link">{post.data.title}</a>
+              <p class="muted font-ui meta"><FormattedDate date={post.data.pubDate} /></p>
+              <p class="excerpt">{post.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+      {posts.length > recent.length && (
+        <p class="font-ui"><a href="/blog">See all posts &rarr;</a></p>
+      )}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-body {
+    /* solid background so the page covers the hero as it scrolls up */
+    background: var(--color-bg);
+    position: relative;
+  }
+  .intro {
+    margin-block: 3rem 2.5rem;
+  }
+  .lede {
+    font-size: 1.25rem;
+    color: var(--color-muted);
+    max-width: 34rem;
+  }
+  .section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+  .post-link {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .meta {
+    margin: 0.2rem 0 0.4rem;
+    font-size: 0.85rem;
+  }
+  .excerpt {
+    margin: 0;
+  }
+</style>

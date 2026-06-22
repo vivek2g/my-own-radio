@@ -1,0 +1,76 @@
+---
+// Layout for a single blog post. Receives the post's typed frontmatter and
+// renders the article body into the <slot />.
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, updatedDate, tags } = post.data;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container">
+  <article>
+    <header class="post-header">
+      <h1>{title}</h1>
+      <p class="muted font-ui meta">
+        <FormattedDate date={pubDate} />
+        {updatedDate && <span> &middot; updated <FormattedDate date={updatedDate} /></span>}
+      </p>
+      {tags.length > 0 && (
+        <ul class="tags font-ui">
+          {tags.map((tag) => <li>#{tag}</li>)}
+        </ul>
+      )}
+    </header>
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+  <p class="font-ui"><a href="/blog">&larr; Back to the journal</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .post-header {
+    margin-block: 2.5rem 1.5rem;
+  }
+  .post-header h1 {
+    margin-bottom: 0.4rem;
+    font-size: 2rem;
+  }
+  .meta {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .tags {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tags li {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+  }
+  .prose :global(h2) {
+    margin-top: 2rem;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    margin-inline: 0;
+    padding-left: 1rem;
+    color: var(--color-muted);
+    font-style: italic;
+  }
+</style>
