@@ -29,7 +29,7 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
         </ul>
       )}
     </header>
-    <img class="post-hero" src={heroImage ?? '/images/post-default.svg'} alt={heroAlt ?? ''} />
+    <img class="post-hero cut-corner" src={heroImage ?? '/images/post-default.svg'} alt={heroAlt ?? ''} />
     <div class="prose">
       <slot />
     </div>
@@ -46,7 +46,8 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
   }
   .post-header h1 {
     margin: 0.5rem 0 0;
-    font-size: var(--step-3);
+    font-size: clamp(2.2rem, 1.5rem + 3vw, 3.6rem);
+    font-weight: 700;
   }
   .meta {
     margin: 0;
@@ -87,11 +88,19 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
   .prose :global(p) {
     margin: 0 0 1.4rem;
   }
+  /* In-article subheads stay in the reading serif; only the post title uses
+     the display grotesque. */
   .prose :global(h2) {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
     font-size: var(--step-2);
     margin: 2.5rem 0 0.75rem;
   }
   .prose :global(h3) {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
     font-size: var(--step-1);
     margin: 2rem 0 0.5rem;
   }

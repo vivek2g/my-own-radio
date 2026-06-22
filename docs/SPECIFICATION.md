@@ -65,9 +65,9 @@ What the site must do, framed as capabilities rather than code:
 4. **Drafts.** A post can be marked unpublished and excluded from the live site.
 5. **Validate content.** Malformed post metadata (missing title, bad date)
    fails the build rather than shipping broken pages.
-6. **Front page.** The home page opens with a typographic masthead, then
-   presents the newest post as a "lead" (with its image and a larger headline)
-   followed by a compact list of recent posts with thumbnails.
+6. **Front page.** The home page leads with the newest post as a hero
+   (kicker, large display headline, then a big image) followed by a compact list
+   of recent posts with thumbnails.
 7. **Theme.** Light and dark themes; follow the device by default, with a
    manual toggle that is remembered per visitor.
 8. **Be findable and shareable.** Each page has a title, description, canonical
@@ -118,8 +118,8 @@ URL).
 
 | Page | URL | Purpose |
 | --- | --- | --- |
-| Home | `/` | Typographic masthead + lead story + recent-posts list |
-| Journal | `/blog/` | Full list of published posts, newest first |
+| Home | `/` | Lead-story hero + recent-posts list |
+| Journal | `/blog/` | Full list of published posts (with thumbnails), newest first |
 | Post | `/blog/<slug>/` | A single post; one page generated per post |
 | About | `/about/` | Who the author is and what the project is |
 
@@ -177,35 +177,36 @@ here and every consumer can rely on it.
   2. Otherwise, follow the device's light/dark setting automatically.
 - The chosen theme is applied **before the page paints**, so there is no flash
   of the wrong colors on load.
-- The current palette is "soft neutral stone" (warm-grey, low-chroma) so that
-  photographs carry the color. Changing the palette = editing the tokens only.
+- The current palette is "forest on sepia": warm cream/sepia backgrounds with a
+  deep forest-green accent (and a warm-dark green-accented dark theme). Changing
+  the palette = editing the tokens only.
 
 ### Typography (part of the theming contract)
 
-- The design language is "quiet editorial": typography-led and restrained.
-- Two typefaces: a **reading serif** (Newsreader) for headings and body, and a
-  **UI sans** (Inter) for small interface text (nav, dates, labels). They are
-  referenced through `--font-body` / `--font-ui` tokens, so swapping a typeface
-  is a token change.
+- The design language is editorial: a contrast between a punchy display face and
+  a calm reading serif.
+- Three typefaces, referenced through tokens so any can be swapped centrally:
+  a **display grotesque** (Space Grotesk, `--font-display`) for big headlines,
+  page/post titles and the brand; a **reading serif** (Newsreader, `--font-body`)
+  for body text and in-article subheads; and a **UI sans** (Inter, `--font-ui`)
+  for small labels (nav, dates).
 - A **fluid type scale** (`--step--1` … `--step-3`, built with `clamp()`) sizes
   text smoothly between phone and desktop, so there are no abrupt jumps at
-  breakpoints. Content sits in a single centered column of roughly 66 characters
-  on every screen.
-- Decisions and rationale for the typeface choice and font delivery live in
-  `DECISIONS.md` (#11, #12).
+  breakpoints. Article content sits in a single centered column of ~66 chars.
+- Decisions and rationale live in `DECISIONS.md` (#11, #12, #14, #15).
 
 ---
 
 ## 8. Front-page presentation (contract)
 
-The home page uses a "lead story + list" model (an editorial/news pattern),
-not a full-bleed photo hero. (An earlier full-bleed photo hero was tried and
-retired; see `DECISIONS.md` #8/#13.)
+The home page uses a "lead story + list" model (an editorial/news pattern). The
+lead is presented as a **hero in "headline → image" form**, never text overlaid
+on a photo. (An earlier full-bleed text-over-photo hero was tried and retired;
+see `DECISIONS.md` #8/#13/#16.)
 
-- It opens with a **typographic masthead**: a short kicker and a one-paragraph
-  statement of what the journal is — set in type, no background photo.
-- The **newest post is the "lead"**: its `heroImage` is shown at a larger size
-  above a larger headline, date, and excerpt.
+- The **newest post is the "lead" hero**: a kicker ("Journal — date"), a large
+  display headline, then a big image with an angled "cut corner", then the
+  excerpt. The whole block links to the post.
 - **Remaining recent posts** follow as a compact list, each a small thumbnail
   beside its date and title. On phones the thumbnail stacks above the title.
 - Posts **without** a `heroImage` fall back to a shared on-brand default image

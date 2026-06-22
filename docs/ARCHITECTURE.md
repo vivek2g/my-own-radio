@@ -71,9 +71,10 @@ styles. As CSS custom properties in `:root` it defines:
 
 - **Colors** — background, surface, text, muted, accent, border (plus a
   dark-theme block; see "Theming mechanism" below).
-- **Fonts** — `--font-body` (Newsreader, the reading serif) and `--font-ui`
-  (Inter, the UI sans). The fonts themselves are loaded once in
-  `BaseLayout.astro`'s `<head>` from Google Fonts.
+- **Fonts** — `--font-display` (Space Grotesk, headlines/brand), `--font-body`
+  (Newsreader, reading serif) and `--font-ui` (Inter, UI sans). Loaded once in
+  `BaseLayout.astro`'s `<head>` from Google Fonts. A `.cut-corner` utility class
+  applies the angled-corner clip-path used on large hero images.
 - **A fluid type scale** — `--step--1` through `--step-3`, each a `clamp()` that
   grows smoothly with screen width, so type never jumps at breakpoints. Pages
   reference these steps instead of hardcoded sizes.

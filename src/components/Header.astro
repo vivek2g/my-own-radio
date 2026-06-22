@@ -10,7 +10,7 @@ const links = [
 
 <header class="site-header font-ui">
   <div class="bar">
-    <a href="/" class="brand">My Own Radio</a>
+    <a href="/" class="brand"><span class="brand__dot" aria-hidden="true"></span>My Own Radio</a>
     <nav>
       {links.map((link) => <a href={link.href}>{link.label}</a>)}
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme"></button>
@@ -39,10 +39,21 @@ const links = [
     padding-inline: clamp(1.1rem, 4vw, 2.75rem);
   }
   .brand {
+    font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.15rem;
-    letter-spacing: -0.01em;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
     color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .brand__dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex: none;
   }
   nav {
     display: flex;

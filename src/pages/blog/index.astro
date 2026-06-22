@@ -1,5 +1,5 @@
 ---
-// The full list of published posts, newest first.
+// The full list of published posts, newest first, each with a thumbnail.
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
@@ -7,6 +7,8 @@ import FormattedDate from '../../components/FormattedDate.astro';
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
 );
+
+const DEFAULT_IMAGE = '/images/post-default.svg';
 ---
 
 <BaseLayout title="Journal - My Own Radio" description="All posts.">
@@ -18,9 +20,14 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     <ul class="post-list">
       {posts.map((post) => (
         <li>
-          <p class="kicker meta"><FormattedDate date={post.data.pubDate} /></p>
-          <a href={`/blog/${post.id}/`} class="post-link">{post.data.title}</a>
-          <p class="excerpt">{post.data.description}</p>
+          <a class="card" href={`/blog/${post.id}/`}>
+            <img class="card__img" src={post.data.heroImage ?? DEFAULT_IMAGE} alt={post.data.heroAlt ?? ''} />
+            <div class="card__text">
+              <p class="kicker meta"><FormattedDate date={post.data.pubDate} /></p>
+              <h2 class="card__title">{post.data.title}</h2>
+              <p class="excerpt">{post.data.description}</p>
+            </div>
+          </a>
         </li>
       ))}
     </ul>
@@ -30,7 +37,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 
 <style>
   .page-title {
-    font-size: var(--step-3);
+    font-size: clamp(2.2rem, 1.5rem + 3vw, 3.6rem);
+    font-weight: 700;
     margin-block: 3.5rem 2.5rem;
   }
   .post-list {
@@ -38,23 +46,52 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 2.5rem;
+    gap: 2.25rem;
   }
-  .post-link {
-    font-size: var(--step-1);
-    font-weight: 600;
-    color: var(--color-text);
-    letter-spacing: -0.01em;
+  .card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.4rem;
+    align-items: start;
+    color: inherit;
+    padding-bottom: 2.25rem;
+    border-bottom: 1px solid var(--color-border);
   }
-  .post-link:hover {
-    color: var(--color-accent);
+  .card:hover {
     text-decoration: none;
+  }
+  .card__img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
   }
   .meta {
     margin: 0 0 0.4rem;
   }
+  .card__title {
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.4rem;
+    line-height: 1.2;
+  }
+  .card:hover .card__title {
+    color: var(--color-accent);
+  }
   .excerpt {
     margin: 0;
     color: var(--color-muted);
+  }
+
+  /* Stack on phones */
+  @media (max-width: 560px) {
+    .card {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+    .card__img {
+      aspect-ratio: 16 / 9;
+    }
   }
 </style>
