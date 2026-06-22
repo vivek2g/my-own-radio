@@ -66,10 +66,24 @@ static page each. The post body is rendered via `render()` from `astro:content`.
 
 ## Styling
 
-One stylesheet, `src/styles/global.css`. Colors, fonts, and spacing are CSS
-custom properties in `:root`, so the whole site can be re-themed by editing a
-handful of variables (including a dark-mode block). Component-specific styles
-live in `<style>` blocks inside each `.astro` file and are scoped automatically.
+One stylesheet, `src/styles/global.css`, holds the design tokens and base
+styles. As CSS custom properties in `:root` it defines:
+
+- **Colors** — background, surface, text, muted, accent, border (plus a
+  dark-theme block; see "Theming mechanism" below).
+- **Fonts** — `--font-body` (Newsreader, the reading serif) and `--font-ui`
+  (Inter, the UI sans). The fonts themselves are loaded once in
+  `BaseLayout.astro`'s `<head>` from Google Fonts.
+- **A fluid type scale** — `--step--1` through `--step-3`, each a `clamp()` that
+  grows smoothly with screen width, so type never jumps at breakpoints. Pages
+  reference these steps instead of hardcoded sizes.
+
+Because everything keys off these tokens, the whole site can be re-themed or
+re-typed by editing this one file. A shared `.kicker` utility class provides the
+small letter-spaced uppercase labels (section titles, post dates) that define
+the editorial look. Component-specific styles live in scoped `<style>` blocks
+inside each `.astro` file; a few reading-specific rules (drop cap, blockquote,
+prose rhythm) live in `PostLayout.astro`.
 
 ## What deliberately does NOT exist yet
 

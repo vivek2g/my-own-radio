@@ -177,6 +177,20 @@ here and every consumer can rely on it.
 - The current palette is "soft neutral stone" (warm-grey, low-chroma) so that
   photographs carry the color. Changing the palette = editing the tokens only.
 
+### Typography (part of the theming contract)
+
+- The design language is "quiet editorial": typography-led and restrained.
+- Two typefaces: a **reading serif** (Newsreader) for headings and body, and a
+  **UI sans** (Inter) for small interface text (nav, dates, labels). They are
+  referenced through `--font-body` / `--font-ui` tokens, so swapping a typeface
+  is a token change.
+- A **fluid type scale** (`--step--1` … `--step-3`, built with `clamp()`) sizes
+  text smoothly between phone and desktop, so there are no abrupt jumps at
+  breakpoints. Content sits in a single centered column of roughly 66 characters
+  on every screen.
+- Decisions and rationale for the typeface choice and font delivery live in
+  `DECISIONS.md` (#11, #12).
+
 ---
 
 ## 8. Hero behavior (contract)
