@@ -76,7 +76,8 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 6. "Soft neutral stone" palette; system theme + manual toggle
 
-- **Status:** Accepted.
+- **Status:** Palette superseded by #14; the theme behaviour (system default +
+  remembered toggle) still stands.
 - **Decision:** Use a low-chroma warm-grey ("stone") palette. Follow the
   device's light/dark setting by default, and offer a header toggle that is
   remembered per visitor and applied before paint (no flash).
@@ -181,3 +182,35 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   was removed (recoverable from Git history).
 - **Trade-off:** Posts look best with a `heroImage`; without one they still work
   but show no thumbnail. That's an acceptable, graceful degradation.
+
+## 14. "Forest on sepia" palette (supersedes the stone palette of #6)
+
+- **Status:** Accepted (supersedes the palette in #6).
+- **Decision:** Warm cream/sepia backgrounds with a deep forest-green accent and
+  warm-ink text; matching dark theme (warm-dark bg, light-green accent).
+- **Why:** Green reads as nature and calm and fits a Himalayan trek/philosophy
+  journal; sepia adds warmth. Together they give the site a distinct, grounded
+  identity that the neutral stone lacked. Chosen from a green-on-cream vs
+  green-on-sepia comparison; sepia won for being warmer and richer.
+
+## 15. Display headlines in a grotesque (Space Grotesk)
+
+- **Status:** Accepted (refines the typography of #11).
+- **Decision:** Big headlines — page/post titles, the homepage lead, and the
+  brand wordmark — use **Space Grotesk** (a bold geometric grotesque). Body text
+  stays **Newsreader** serif, and in-article subheads (`h2`/`h3` inside a post)
+  also stay serif so reading flow is calm. Small labels stay **Inter**.
+- **Why:** A heavy grotesque gives titles a modern, punchy, editorial feel
+  (matching the reference the author liked) while the serif keeps the reading
+  experience literary. The serif/grotesque split is a deliberate contrast.
+
+## 16. Homepage hero returns as "headline → image" (not text-over-photo)
+
+- **Status:** Accepted (refines #13; the lead-story + list structure stands).
+- **Decision:** The homepage still leads with the newest post, but now styled as
+  a hero: kicker, large display headline, then a big image with an angled
+  "cut corner", then the excerpt — image below the headline, never text over the
+  photo. The journal index gained a thumbnail for every entry.
+- **Why:** It brings back a prominent photo (which the author wanted) without the
+  legibility problem of overlaying the title on the image. The cut corner is a
+  small editorial flourish from the reference design.

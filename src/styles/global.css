@@ -5,14 +5,16 @@
 */
 
 :root {
-  --color-bg: #f4f3f1;
-  --color-surface: #ffffff;
-  --color-text: #232220;
-  --color-muted: #7c7973;
-  --color-accent: #5b6b73;      /* soft slate; quiet so the photos carry the color */
-  --color-border: #e3e1dc;
+  --color-bg: #f0e9d8;          /* warm sepia / cream */
+  --color-surface: #f7f1e3;     /* lighter cream for header/cards */
+  --color-text: #221f1a;        /* warm ink */
+  --color-muted: #847b65;       /* warm muted */
+  --color-accent: #3a6b4e;      /* forest green */
+  --color-border: #e1d8c3;      /* warm hairline */
 
-  /* Reading serif (Newsreader) with graceful fallbacks; UI sans (Inter). */
+  /* Display grotesque (headlines), reading serif (Newsreader, body),
+     UI sans (Inter, small labels). */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
@@ -35,21 +37,21 @@
    2. The visitor explicitly chose dark via the header toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --color-bg: #1a1916;
-    --color-surface: #211f1c;
-    --color-text: #ecebe7;
-    --color-muted: #a3a09a;
-    --color-accent: #9fb0b8;
-    --color-border: #322f2a;
+    --color-bg: #1a1813;
+    --color-surface: #221f17;
+    --color-text: #ece6d6;
+    --color-muted: #a59c84;
+    --color-accent: #8fbf9f;
+    --color-border: #34301f;
   }
 }
 :root[data-theme='dark'] {
-  --color-bg: #1a1916;
-  --color-surface: #211f1c;
-  --color-text: #ecebe7;
-  --color-muted: #a3a09a;
-  --color-accent: #9fb0b8;
-  --color-border: #322f2a;
+  --color-bg: #1a1813;
+  --color-surface: #221f17;
+  --color-text: #ece6d6;
+  --color-muted: #a59c84;
+  --color-accent: #8fbf9f;
+  --color-border: #34301f;
 }
 
 * {
@@ -87,9 +89,16 @@ a:hover {
 }
 
 h1, h2, h3 {
-  line-height: 1.18;
+  font-family: var(--font-display);
+  line-height: 1.1;
   font-weight: 600;
-  letter-spacing: -0.01em;   /* subtle tightening reads more 'set', less default */
+  letter-spacing: -0.02em;   /* grotesque display reads tighter */
+}
+
+/* Angled "cut corner" on large images (top-left + bottom-right), matching the
+   editorial hero look. */
+.cut-corner {
+  clip-path: polygon(4% 0, 100% 0, 100% 93%, 96% 100%, 0 100%, 0 7%);
 }
 
 /* A reusable kicker: the small letter-spaced, uppercase label that gives the
