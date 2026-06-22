@@ -1,90 +1,171 @@
 ---
-// Home page. Shows a short intro and the most recent posts.
+// Home page (option 2: "lead story + list").
+// The newest post leads with its image and a larger headline; the rest follow
+// as compact entries with a small thumbnail.
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
 );
-const recent = posts.slice(0, 5);
+
+const [lead, ...rest] = posts;
+const restToShow = rest.slice(0, 6);
 ---
 
 <BaseLayout title="My Own Radio">
-  <Hero />
-
-  <div class="container home-body">
-    <section class="intro">
+  <div class="container home">
+    <section class="masthead">
+      <p class="kicker">A journal of treks &amp; philosophy</p>
       <p class="lede">
-        A journal of treks and travels, and a slow inquiry into who I am and what
-        this is all for &mdash; drawn from Hinduism, other traditions, and
-        philosophy.
+        Notes from the trail and from the mind &mdash; treks, travel, and a slow
+        inquiry into who I am and what this is all for, drawn from Hinduism,
+        other traditions, and philosophy.
       </p>
     </section>
 
-    <section>
-      <h2 class="kicker">Latest from the journal</h2>
-      {recent.length === 0 ? (
-        <p class="muted">No posts yet. The first one is on its way.</p>
-      ) : (
-        <ul class="post-list">
-          {recent.map((post) => (
-            <li>
-              <p class="kicker meta"><FormattedDate date={post.data.pubDate} /></p>
-              <a href={`/blog/${post.id}/`} class="post-link">{post.data.title}</a>
-              <p class="excerpt">{post.data.description}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-      {posts.length > recent.length && (
-        <p class="font-ui"><a href="/blog">See all posts &rarr;</a></p>
-      )}
-    </section>
+    {posts.length === 0 ? (
+      <p class="muted">No posts yet. The first one is on its way.</p>
+    ) : (
+      <>
+        <a class="lead" href={`/blog/${lead.id}/`}>
+          {lead.data.heroImage && (
+            <img class="lead__img" src={lead.data.heroImage} alt={lead.data.heroAlt ?? ''} />
+          )}
+          <p class="kicker"><FormattedDate date={lead.data.pubDate} /></p>
+          <h2 class="lead__title">{lead.data.title}</h2>
+          <p class="lead__excerpt">{lead.data.description}</p>
+        </a>
+
+        {restToShow.length > 0 && (
+          <ul class="list">
+            {restToShow.map((post) => (
+              <li>
+                <a class="row" href={`/blog/${post.id}/`}>
+                  {post.data.heroImage && (
+                    <img class="row__img" src={post.data.heroImage} alt={post.data.heroAlt ?? ''} />
+                  )}
+                  <div class="row__text">
+                    <p class="kicker"><FormattedDate date={post.data.pubDate} /></p>
+                    <h3 class="row__title">{post.data.title}</h3>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {posts.length > restToShow.length + 1 && (
+          <p class="more font-ui"><a href="/blog">See all posts &rarr;</a></p>
+        )}
+      </>
+    )}
   </div>
 </BaseLayout>
 
 <style>
-  .home-body {
-    /* solid background so the page covers the hero as it scrolls up */
-    background: var(--color-bg);
-    position: relative;
-  }
-  .intro {
-    margin-block: 3.5rem 3rem;
+  .masthead {
+    margin-block: 3.5rem 2.75rem;
     padding-bottom: 2.5rem;
     border-bottom: 1px solid var(--color-border);
   }
-  .lede {
+  .masthead .lede {
     font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.4rem);
-    line-height: 1.55;
+    line-height: 1.5;
     color: var(--color-text);
     max-width: 34rem;
-    margin: 0;
+    margin: 0.7rem 0 0;
   }
-  .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 1.75rem 0 0;
-    display: grid;
-    gap: 2.5rem;
+
+  /* Lead story */
+  .lead {
+    display: block;
+    color: inherit;
   }
-  .post-link {
-    font-size: var(--step-1);
-    font-weight: 600;
-    color: var(--color-text);
-    letter-spacing: -0.01em;
-  }
-  .post-link:hover {
-    color: var(--color-accent);
+  .lead:hover {
     text-decoration: none;
   }
-  .meta {
+  .lead__img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 1.1rem;
+  }
+  .lead .kicker {
+    margin: 0;
+  }
+  .lead__title {
+    font-size: var(--step-2);
     margin: 0.35rem 0 0.5rem;
   }
-  .excerpt {
-    margin: 0;
+  .lead:hover .lead__title {
+    color: var(--color-accent);
+  }
+  .lead__excerpt {
+    font-size: var(--step-0);
     color: var(--color-muted);
+    margin: 0;
+    max-width: 36rem;
+  }
+
+  /* Secondary list */
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 2.75rem 0 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .row {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--color-border);
+    color: inherit;
+  }
+  .row:hover {
+    text-decoration: none;
+  }
+  .row__img {
+    width: 112px;
+    height: 76px;
+    flex: none;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .row__text {
+    min-width: 0;
+  }
+  .row .kicker {
+    margin: 0 0 0.2rem;
+  }
+  .row__title {
+    font-size: var(--step-1);
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.25;
+  }
+  .row:hover .row__title {
+    color: var(--color-accent);
+  }
+
+  .more {
+    margin-top: 1.75rem;
+  }
+
+  /* On phones, stack the thumbnail above the title for breathing room */
+  @media (max-width: 540px) {
+    .row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.7rem;
+    }
+    .row__img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
   }
 </style>

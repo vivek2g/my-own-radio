@@ -65,8 +65,9 @@ What the site must do, framed as capabilities rather than code:
 4. **Drafts.** A post can be marked unpublished and excluded from the live site.
 5. **Validate content.** Malformed post metadata (missing title, bad date)
    fails the build rather than shipping broken pages.
-6. **Set mood with a hero.** The home page opens with a full-screen photo that
-   fades/lifts away as the reader scrolls into the writing.
+6. **Front page.** The home page opens with a typographic masthead, then
+   presents the newest post as a "lead" (with its image and a larger headline)
+   followed by a compact list of recent posts with thumbnails.
 7. **Theme.** Light and dark themes; follow the device by default, with a
    manual toggle that is remembered per visitor.
 8. **Be findable and shareable.** Each page has a title, description, canonical
@@ -117,7 +118,7 @@ URL).
 
 | Page | URL | Purpose |
 | --- | --- | --- |
-| Home | `/` | Hero + short intro + most recent posts |
+| Home | `/` | Typographic masthead + lead story + recent-posts list |
 | Journal | `/blog/` | Full list of published posts, newest first |
 | Post | `/blog/<slug>/` | A single post; one page generated per post |
 | About | `/about/` | Who the author is and what the project is |
@@ -144,6 +145,8 @@ the file. The schema is enforced at build time (defined in
 | `pubDate` | yes | Publication date (`YYYY-MM-DD`) |
 | `updatedDate` | no | Date of a later revision |
 | `tags` | no | List of topic labels; defaults to empty |
+| `heroImage` | no | Path to the post's lead image (e.g. `/images/post-x.jpg`); shown on the post page and as the homepage thumbnail |
+| `heroAlt` | no | Alt text describing the image, for accessibility |
 | `draft` | no | `true` hides the post from the live site; defaults to `false` |
 
 **Contract guarantees:**
@@ -193,19 +196,22 @@ here and every consumer can rely on it.
 
 ---
 
-## 8. Hero behavior (contract)
+## 8. Front-page presentation (contract)
 
-- The home page opens with a **hero**: a full-bleed photo (`public/images/`)
-  with the site title and tagline overlaid lower-left, over a **scrim** (a soft
-  dark wash that guarantees light text stays legible over any photo).
-- As the reader scrolls, the hero content **fades and lifts**, handing off to
-  the reading view below.
-- The effect is **progressive enhancement**: with JavaScript disabled, or when
-  the visitor prefers reduced motion, the hero simply scrolls away normally with
-  no fade. The site is fully usable either way.
-- The hero is shorter on small screens so some writing is reachable sooner.
-- The hero image is a content asset, not code: swapping the photo is a
-  file replacement, and the crop focal point is a single CSS value.
+The home page uses a "lead story + list" model (an editorial/news pattern),
+not a full-bleed photo hero. (An earlier full-bleed photo hero was tried and
+retired; see `DECISIONS.md` #8/#13.)
+
+- It opens with a **typographic masthead**: a short kicker and a one-paragraph
+  statement of what the journal is — set in type, no background photo.
+- The **newest post is the "lead"**: its `heroImage` is shown at a larger size
+  above a larger headline, date, and excerpt.
+- **Remaining recent posts** follow as a compact list, each a small thumbnail
+  beside its date and title. On phones the thumbnail stacks above the title.
+- Posts **without** a `heroImage` still appear correctly — the image is simply
+  omitted. Images are content assets in `public/images/`, swapped by file.
+- Individual **post pages** show the post's `heroImage` beneath the title block,
+  news-style, with `heroAlt` for accessibility.
 
 ---
 
@@ -265,8 +271,9 @@ An implementation satisfies this spec if:
    post page appear, listed newest-first on home and journal pages.
 2. A `draft: true` post is absent from the live build.
 3. Invalid frontmatter fails the build.
-4. The home page shows a full-screen photo hero that hands off to the reading
-   view on scroll, and degrades gracefully without JS / with reduced motion.
+4. The home page shows a typographic masthead, a lead story with its image, and
+   a list of recent posts with thumbnails; posts without an image still render
+   correctly. Post pages show the post's lead image with alt text.
 5. Light and dark themes both render with readable contrast; the site follows
    the device by default and honors a remembered manual toggle with no flash.
 6. Every page has a title, description, canonical URL, and social-preview tags.

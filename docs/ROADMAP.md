@@ -15,7 +15,8 @@ philosophical reflections.
 In scope:
 
 - Static Astro site, Markdown posts, validated content schema.
-- Home page with photo hero; journal list; individual post pages; about page.
+- Home page with typographic masthead + lead-story/list; journal list;
+  individual post pages (with lead images); about page.
 - Light/dark theming with system default + manual toggle.
 - SEO/social metadata.
 - Deployed free on Cloudflare Pages from GitHub.
