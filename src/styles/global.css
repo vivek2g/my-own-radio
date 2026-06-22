@@ -12,10 +12,19 @@
   --color-accent: #5b6b73;      /* soft slate; quiet so the photos carry the color */
   --color-border: #e3e1dc;
 
-  --font-body: ui-serif, Georgia, "Times New Roman", serif;
-  --font-ui: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  /* Reading serif (Newsreader) with graceful fallbacks; UI sans (Inter). */
+  --font-body: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  --max-width: 46rem;
+  /* Fluid type scale: each size grows smoothly between a phone and a wide
+     screen using clamp(min, preferred, max). No abrupt jumps at breakpoints. */
+  --step--1: clamp(0.83rem, 0.80rem + 0.15vw, 0.92rem);  /* small labels, dates */
+  --step-0:  clamp(1.06rem, 1.00rem + 0.30vw, 1.22rem);  /* body text */
+  --step-1:  clamp(1.30rem, 1.18rem + 0.55vw, 1.62rem);  /* small headings */
+  --step-2:  clamp(1.58rem, 1.36rem + 1.05vw, 2.20rem);  /* section / post H2 */
+  --step-3:  clamp(2.00rem, 1.55rem + 2.20vw, 3.20rem);  /* page / post titles */
+
+  --max-width: 40rem;   /* ~66-character reading measure */
   --space: 1rem;
   --radius: 10px;
 }
@@ -51,8 +60,11 @@ html {
   font-family: var(--font-body);
   color: var(--color-text);
   background: var(--color-bg);
-  line-height: 1.7;
+  font-size: var(--step-0);
+  line-height: 1.72;
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -62,7 +74,7 @@ body {
 .container {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding-inline: 1.25rem;
+  padding-inline: 1.4rem;
 }
 
 a {
@@ -71,11 +83,24 @@ a {
 }
 a:hover {
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 h1, h2, h3 {
-  line-height: 1.25;
-  font-weight: 700;
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.01em;   /* subtle tightening reads more 'set', less default */
+}
+
+/* A reusable kicker: the small letter-spaced, uppercase label that gives the
+   site its quiet-editorial feel (section titles, dates above posts). */
+.kicker {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
 
 img {
