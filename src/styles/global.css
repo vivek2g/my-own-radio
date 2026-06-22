@@ -1,0 +1,107 @@
+/*
+  Global styles for My Own Radio.
+  Kept deliberately small and readable. Design tokens live in :root as CSS
+  variables so you can re-theme the whole site by editing a few values here.
+*/
+
+:root {
+  --color-bg: #f4f3f1;
+  --color-surface: #ffffff;
+  --color-text: #232220;
+  --color-muted: #7c7973;
+  --color-accent: #5b6b73;      /* soft slate; quiet so the photos carry the color */
+  --color-border: #e3e1dc;
+
+  --font-body: ui-serif, Georgia, "Times New Roman", serif;
+  --font-ui: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  --max-width: 46rem;
+  --space: 1rem;
+  --radius: 10px;
+}
+
+/* Dark theme tokens.
+   Applied in two cases:
+   1. The visitor's device is in dark mode AND they haven't forced light.
+   2. The visitor explicitly chose dark via the header toggle. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #1a1916;
+    --color-surface: #211f1c;
+    --color-text: #ecebe7;
+    --color-muted: #a3a09a;
+    --color-accent: #9fb0b8;
+    --color-border: #322f2a;
+  }
+}
+:root[data-theme='dark'] {
+  --color-bg: #1a1916;
+  --color-surface: #211f1c;
+  --color-text: #ecebe7;
+  --color-muted: #a3a09a;
+  --color-accent: #9fb0b8;
+  --color-border: #322f2a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+h1, h2, h3 {
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2rem 0;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--color-border);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.font-ui {
+  font-family: var(--font-ui);
+}
+
+.muted {
+  color: var(--color-muted);
+}

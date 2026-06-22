@@ -1,0 +1,22 @@
+{
+  "name": "my-own-radio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "My Own Radio - a personal blog documenting treks, travel, and philosophical/spiritual reflections. Phase 1 of the My Own Radio project.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.6.0"
+  }
+}
