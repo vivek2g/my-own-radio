@@ -12,6 +12,9 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 
 const [lead, ...rest] = posts;
 const restToShow = rest.slice(0, 6);
+
+// Shown when a post has no heroImage of its own.
+const DEFAULT_IMAGE = '/images/post-default.svg';
 ---
 
 <BaseLayout title="My Own Radio">
@@ -30,9 +33,7 @@ const restToShow = rest.slice(0, 6);
     ) : (
       <>
         <a class="lead" href={`/blog/${lead.id}/`}>
-          {lead.data.heroImage && (
-            <img class="lead__img" src={lead.data.heroImage} alt={lead.data.heroAlt ?? ''} />
-          )}
+          <img class="lead__img" src={lead.data.heroImage ?? DEFAULT_IMAGE} alt={lead.data.heroAlt ?? ''} />
           <p class="kicker"><FormattedDate date={lead.data.pubDate} /></p>
           <h2 class="lead__title">{lead.data.title}</h2>
           <p class="lead__excerpt">{lead.data.description}</p>
@@ -43,9 +44,7 @@ const restToShow = rest.slice(0, 6);
             {restToShow.map((post) => (
               <li>
                 <a class="row" href={`/blog/${post.id}/`}>
-                  {post.data.heroImage && (
-                    <img class="row__img" src={post.data.heroImage} alt={post.data.heroAlt ?? ''} />
-                  )}
+                  <img class="row__img" src={post.data.heroImage ?? DEFAULT_IMAGE} alt={post.data.heroAlt ?? ''} />
                   <div class="row__text">
                     <p class="kicker"><FormattedDate date={post.data.pubDate} /></p>
                     <h3 class="row__title">{post.data.title}</h3>

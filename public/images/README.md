@@ -16,7 +16,9 @@ thumbnail (or large lead image) on the home page.
    heroAlt: "Short description of what's in the photo, for accessibility."
    ```
 
-A post without `heroImage` still works — it just shows no thumbnail.
+A post without `heroImage` still works — it falls back to the shared default
+image `post-default.svg` (a minimal stone mountain graphic), so the layout
+always has an image.
 
 ### Recommended
 
@@ -32,6 +34,8 @@ A post without `heroImage` still works — it just shows no thumbnail.
 - `post-chaukhamba.jpg`, `post-ridge.jpg`, `post-walking.jpg` — sample images for
   the three sample posts (derived from `IMG_0370.JPG`). Replace with your own
   per-post photos.
+- `post-default.svg` — the default fallback image used for posts with no
+  `heroImage`. Edit this file to change the placeholder for the whole site.
 - `IMG_0370.JPG` — the original Madhyamaheshwar source photo (kept as a backup).
 - `hero.jpg` — a cropped/cooled version from the earlier full-bleed hero design,
   now unused. Safe to delete if you don't repurpose it.

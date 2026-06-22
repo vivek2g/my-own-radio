@@ -29,9 +29,7 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
         </ul>
       )}
     </header>
-    {heroImage && (
-      <img class="post-hero" src={heroImage} alt={heroAlt ?? ''} />
-    )}
+    <img class="post-hero" src={heroImage ?? '/images/post-default.svg'} alt={heroAlt ?? ''} />
     <div class="prose">
       <slot />
     </div>

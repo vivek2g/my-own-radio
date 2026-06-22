@@ -208,8 +208,12 @@ retired; see `DECISIONS.md` #8/#13.)
   above a larger headline, date, and excerpt.
 - **Remaining recent posts** follow as a compact list, each a small thumbnail
   beside its date and title. On phones the thumbnail stacks above the title.
-- Posts **without** a `heroImage` still appear correctly — the image is simply
-  omitted. Images are content assets in `public/images/`, swapped by file.
+- Posts **without** a `heroImage` fall back to a shared on-brand default image
+  (`public/images/post-default.svg`), so the layout always has an image. Images
+  are content assets in `public/images/`, swapped by file.
+- The site **header and footer span the full page width** (logo far left, nav
+  far right, like Medium), even though article content stays in the narrow
+  reading column. The header is sticky on scroll.
 - Individual **post pages** show the post's `heroImage` beneath the title block,
   news-style, with `heroAlt` for accessibility.
 
