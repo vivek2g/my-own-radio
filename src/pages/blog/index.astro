@@ -18,8 +18,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     <ul class="post-list">
       {posts.map((post) => (
         <li>
+          <p class="kicker meta"><FormattedDate date={post.data.pubDate} /></p>
           <a href={`/blog/${post.id}/`} class="post-link">{post.data.title}</a>
-          <p class="muted font-ui meta"><FormattedDate date={post.data.pubDate} /></p>
           <p class="excerpt">{post.data.description}</p>
         </li>
       ))}
@@ -30,24 +30,31 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 
 <style>
   .page-title {
-    margin-block: 3rem 2rem;
+    font-size: var(--step-3);
+    margin-block: 3.5rem 2.5rem;
   }
   .post-list {
     list-style: none;
     padding: 0;
+    margin: 0;
     display: grid;
-    gap: 2rem;
+    gap: 2.5rem;
   }
   .post-link {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: var(--step-1);
+    font-weight: 600;
     color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+  .post-link:hover {
+    color: var(--color-accent);
+    text-decoration: none;
   }
   .meta {
-    margin: 0.2rem 0 0.4rem;
-    font-size: 0.85rem;
+    margin: 0 0 0.4rem;
   }
   .excerpt {
     margin: 0;
+    color: var(--color-muted);
   }
 </style>
