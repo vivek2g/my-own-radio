@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, description, pubDate, updatedDate, tags } = post.data;
+const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = post.data;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -29,6 +29,9 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
         </ul>
       )}
     </header>
+    {heroImage && (
+      <img class="post-hero" src={heroImage} alt={heroAlt ?? ''} />
+    )}
     <div class="prose">
       <slot />
     </div>
@@ -72,6 +75,14 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
     border: 1px solid var(--color-border);
     padding: 0.15rem 0.6rem;
     border-radius: 999px;
+  }
+
+  .post-hero {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin: 0 0 2rem;
   }
 
   /* Reading body rhythm */

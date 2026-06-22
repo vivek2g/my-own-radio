@@ -100,7 +100,7 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 8. Hero scroll-away as progressive enhancement
 
-- **Status:** Accepted.
+- **Status:** Superseded by #13 (the full-bleed photo hero was retired).
 - **Decision:** The home hero's fade-on-scroll is an enhancement layered on top
   of a site that works without it (no JS, or reduced-motion → the hero just
   scrolls normally).
@@ -164,3 +164,20 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   would be faster and more private (no third-party request) at the cost of a
   build dependency and a few KB in the repo. Revisit if font loading becomes a
   measured performance or privacy concern.
+
+## 13. Front page: "lead story + list", not a full-bleed photo hero
+
+- **Status:** Accepted (supersedes #8).
+- **Context:** A full-bleed photo hero was built first, but the available photo
+  was a posed portrait that fought the title and read as a snapshot rather than
+  an atmospheric image. Three alternatives were compared.
+- **Decision:** Drop the full-bleed photo hero. The home page opens with a
+  typographic masthead and uses an editorial "lead story + list" layout: newest
+  post leads with its image; the rest follow as compact entries with thumbnails.
+  Posts carry an optional `heroImage`/`heroAlt`, shown on the post page too.
+- **Why:** It's the news/editorial feel that suits a writing site, uses photos
+  where they're earned (on the posts), keeps the front page calm, and removes
+  the fragile dependency on one perfect hero photo. The `Hero.astro` component
+  was removed (recoverable from Git history).
+- **Trade-off:** Posts look best with a `heroImage`; without one they still work
+  but show no thumbnail. That's an acceptable, graceful degradation.

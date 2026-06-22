@@ -18,6 +18,11 @@ const blog = defineCollection({
     updatedDate: z.coerce.date().optional(),
     // Free-form tags, e.g. ["trek", "himalaya", "philosophy"]
     tags: z.array(z.string()).default([]),
+    // Optional lead image, shown on the post page and as the homepage
+    // thumbnail. Path relative to /public, e.g. "/images/post-chaukhamba.jpg".
+    heroImage: z.string().optional(),
+    // Alt text for the image (accessibility). Describe what's in the photo.
+    heroAlt: z.string().optional(),
     // Set draft: true to keep a post out of the published site.
     draft: z.boolean().default(false),
   }),

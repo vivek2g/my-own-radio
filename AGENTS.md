@@ -52,7 +52,7 @@ src/
   content.config.ts   # the post schema (the content contract) — validated at build
   content/blog/       # the posts (Markdown). filename = URL slug
   layouts/            # page shells: BaseLayout (html/head/header/footer), PostLayout
-  components/         # reusable UI: Header (incl. theme toggle), Footer, Hero, FormattedDate
+  components/         # reusable UI: Header (incl. theme toggle), Footer, FormattedDate
   pages/              # routes; file path = URL. index, about, blog/index, blog/[...slug]
   styles/global.css   # design tokens (CSS variables) + base styles; light & dark blocks
 public/               # static assets served as-is (favicon, images/)

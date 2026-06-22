@@ -1,0 +1,31 @@
+---
+title: "What the walk undoes"
+description: "On why a long climb loosens the knots that sitting still only pulls tighter."
+pubDate: 2026-06-12
+tags: ["trek", "reflection"]
+heroImage: "/images/post-ridge.jpg"
+heroAlt: "A grassy ridge falling away to a rocky gorge, with snow peaks behind."
+draft: false
+---
+
+I do some of my clearest thinking when I am too tired to think. Three hours into
+a climb, when the lungs have taken over the conversation and the mind has gone
+quiet for lack of spare oxygen, the problem I carried up usually looks smaller
+than it did at the trailhead.
+
+I don't think the mountain solves anything. I think walking just changes who is
+doing the looking. At a desk the same thought circles, picking up speed. On a
+ridge it has somewhere to go.
+
+## A smaller self, briefly
+
+Part of it is scale. Standing under a wall of rock that has been there for a
+geological age, the things I was anxious about lose their grip — not because they
+stop mattering, but because they stop being the whole world. For an hour I am a
+small thing crossing a large place, and that is a relief I can't manufacture at
+home.
+
+Then I come back down and the inbox is still there. But something has been put
+back in proportion, and it holds for a while.
+
+> Sample text to demonstrate the layout — yours to rewrite.

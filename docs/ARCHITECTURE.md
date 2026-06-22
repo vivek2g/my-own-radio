@@ -115,7 +115,6 @@ src/layouts, components ──┘                │
 In the browser (per visit), only small, optional scripts run:
 
 - The **theme** inline script sets light/dark before paint.
-- The **hero** script fades the hero on scroll (skipped if reduced-motion).
 - The **header toggle** script handles theme switching.
 
 Everything else is static HTML and CSS. There is no application running on a
@@ -132,7 +131,7 @@ Pages (routes)          src/pages/        — what URLs exist; fetch content
    │
 Layouts                 src/layouts/      — page shells (Base, Post)
    │
-Components              src/components/    — reusable UI (Header, Footer, Hero…)
+Components              src/components/    — reusable UI (Header, Footer, FormattedDate)
    │
 Content + tokens        src/content/, src/styles/  — the data and the design vars
 ```
@@ -166,8 +165,9 @@ widget = a component. This keeps edits local and predictable.
   frontmatter. See `README.md` → "Writing a post."
 - **Change the color scheme:** edit the tokens in `src/styles/global.css` (light
   block and the dark block). Nothing else.
-- **Swap the hero photo:** replace `public/images/hero.jpg`; adjust the focal
-  point via `background-position` in `src/components/Hero.astro` if needed.
+- **Give a post a photo:** add an image to `public/images/`, then set
+  `heroImage: "/images/your-file.jpg"` (and `heroAlt`) in the post's frontmatter.
+  It appears on the post page and as the homepage thumbnail/lead image.
 - **Add a nav link:** edit the `links` array in `src/components/Header.astro`.
 - **Add a new top-level section:** add a page in `src/pages/`, then link to it
   from the header.
