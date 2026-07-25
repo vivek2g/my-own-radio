@@ -14,12 +14,13 @@ philosophical reflections.
 
 In scope:
 
-- Static Astro site, Markdown posts, validated content schema.
+- Static Astro site, Markdoc posts (with a dev-only Keystatic editor),
+  validated content schema.
 - Home page with typographic masthead + lead-story/list; journal list;
   individual post pages (with lead images); about page.
 - Light/dark theming with system default + manual toggle.
 - SEO/social metadata.
-- Deployed free on Cloudflare Pages from GitHub.
+- Deployed free on Cloudflare Workers (static assets via wrangler).
 
 Done when: the acceptance criteria in `SPECIFICATION.md` §11 hold and the site
 is live with real posts.
@@ -40,7 +41,7 @@ Candidates (pick deliberately, don't build all):
 - RSS feed and sitemap (cheap, high value for a writing site).
 - Tag pages / filtering.
 - **AI content pipeline (headline feature):** an offline/build-time step that
-  reads the Markdown posts and produces derived data — auto-summaries, suggested
+  reads the posts and produces derived data — auto-summaries, suggested
   tags, and an **embeddings index** powering a "related reflections" search.
   This is implemented as a small island over a prebuilt index, so the site stays
   static. It reuses the same files authors already write, and the index it

@@ -57,7 +57,8 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 4. Content as Markdown files in Git (no CMS)
 
-- **Status:** Accepted.
+- **Status:** Accepted; refined by #17 (posts are now Markdoc `.mdoc` files,
+  editable via a dev-only local editor — Git remains the source of truth).
 - **Decision:** Posts are Markdown files in the repo; Git is the source of truth.
 - **Why:** Portable, durable, diff-able, free, and not locked to any vendor. A
   build-time schema validates each post so broken metadata can't ship.
@@ -66,7 +67,7 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 5. Cloudflare Pages for hosting
 
-- **Status:** Accepted.
+- **Status:** Superseded by #18 (Cloudflare Workers).
 - **Decision:** Deploy to Cloudflare Pages, auto-building from the `main` branch.
 - **Why:** Free tier with a fast global CDN, generous limits, simple Git
   integration, easy custom domains later. Good headroom as traffic grows.
@@ -214,3 +215,65 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 - **Why:** It brings back a prominent photo (which the author wanted) without the
   legibility problem of overlaying the title on the image. The cut corner is a
   small editorial flourish from the reference design.
+
+## 17. Keystatic as a local-mode, dev-only editor (refines #4)
+
+- **Status:** Accepted (refines #4 — files in Git remain the source of truth).
+- **Context:** Writing posts by hand-editing frontmatter is error-prone for a
+  non-JS author. A visual editor was wanted without giving up #4's principles
+  (no vendor lock-in, no backend, Git as the source of truth).
+- **Decision:** Add **Keystatic** in *local* storage mode. The editor runs at
+  `/keystatic` only during `npm run dev` (the integration is conditionally
+  loaded in `astro.config.mjs`); it reads and writes `.mdoc` files on disk.
+  Publishing is still commit + push. Production builds contain no editor, no
+  React, no server.
+- **Why:** All the convenience of a CMS form UI with none of the architecture
+  cost — the built site is byte-for-byte as static as before, and deleting
+  Keystatic would lose nothing but the editing UI. Posts moved from `.md` to
+  `.mdoc` (Markdoc, rendered by `@astrojs/markdoc`), which stays
+  Markdown-compatible for hand-editing.
+- **Alternatives:** Hosted CMS (still rejected per #4); Keystatic's GitHub
+  storage mode (needs an OAuth app and a deployed admin route — unnecessary
+  while the author edits locally; can be revisited if editing from other
+  devices becomes a need).
+
+## 18. Deploy as a Cloudflare Worker with static assets (supersedes #5)
+
+- **Status:** Accepted (supersedes #5).
+- **Context:** #5 chose Cloudflare Pages. Cloudflare has since consolidated on
+  Workers as its primary platform; the repo gained `wrangler.jsonc` and the
+  `@astrojs/cloudflare` adapter, deploying the same static `dist/` as a Worker
+  that serves assets.
+- **Decision:** Host on **Cloudflare Workers** (static assets binding). Deploy
+  with `npm run deploy` (wrangler), or via Workers Builds Git integration.
+- **Why:** Same free CDN hosting and effectively the same static-site behavior,
+  on the platform Cloudflare actively develops; keeps the door open for tiny
+  server endpoints later *without* changing hosts (though heavy logic still
+  belongs in a separate service per #7).
+- **Trade-off:** Deploys go through wrangler instead of Pages' zero-config Git
+  build, so the worker config is one more file to understand
+  (`wrangler.jsonc`).
+
+## 19. Post schema declared twice, guarded by a compile-time parity check
+
+- **Status:** Accepted.
+- **Context:** #17 made the post schema live in two places: the Zod schema in
+  `src/content.config.ts` (build validation) and the field definitions in
+  `keystatic.config.ts` (the editor). The two libraries have incompatible
+  schema languages, so one can't simply import the other. Manual syncing
+  invites silent drift: a field added to the editor but not the content schema
+  (or vice versa) would only surface as confusing behavior much later.
+- **Decision:** Keep both declarations, but enforce parity mechanically:
+  `src/schema-parity.ts` derives the field-name sets from both configs at the
+  type level and makes `npm run check` fail — naming the offending field — if
+  they differ. Value types are deliberately not compared (Keystatic writes
+  strings; Zod coerces), only field names, which are the actual contract.
+- **Why:** Zero runtime cost and no new dependency, in keeping with #2/#7; the
+  failure happens at the moment of the mistake, in the tool contributors
+  already run. Docs (`AGENTS.md`, `README.md`) point schema-changers at both
+  files.
+- **Alternatives:** A code generator producing one config from the other
+  (rejected: heavy machinery for eight fields); a runtime comparison script
+  (rejected: needs a TS runner and duplicates what the type-checker gives for
+  free); discipline alone (rejected: it already failed — this decision exists
+  because the docs drifted).

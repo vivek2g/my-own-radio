@@ -5,7 +5,7 @@ reflection. This is **Phase 1** of the larger *My Own Radio* project; later
 phases add AI narration and a small personal "radio."
 
 Built with [Astro](https://astro.build) (static site), managed in Git, and
-deployed to **Cloudflare Pages**.
+deployed to **Cloudflare Workers** (static assets served from the CDN).
 
 ---
 
@@ -21,11 +21,12 @@ npm install
 # 2. start the dev server with hot reload
 npm run dev
 # open the URL it prints, usually http://localhost:4321
+# the visual post editor lives at http://localhost:4321/keystatic (dev only)
 
 # 3. build the production site into ./dist (what Cloudflare deploys)
 npm run build
 
-# 4. preview the production build locally
+# 4. preview the production build locally (serves dist/ via wrangler)
 npm run preview
 ```
 
@@ -36,9 +37,17 @@ Node version automatically.
 
 ## Writing a post
 
-1. Create a new Markdown file in `src/content/blog/`, e.g.
-   `src/content/blog/manali-to-something.md`. The file name becomes the URL
-   slug (`/blog/manali-to-something/`).
+The easiest way: run `npm run dev` and open **http://localhost:4321/keystatic**
+— a visual editor (Keystatic) that reads and writes the post files on your
+disk. Fill in the fields, write the body, save. The editor only exists in local
+dev; publishing is still just `git commit` + `git push`.
+
+You can also write a post by hand:
+
+1. Create a new Markdoc file in `src/content/blog/`, e.g.
+   `src/content/blog/manali-to-something.mdoc`. The file name becomes the URL
+   slug (`/blog/manali-to-something/`). Markdoc is Markdown-compatible — write
+   plain Markdown and it just works.
 2. Start the file with **frontmatter** (the block between `---` lines). All
    fields are validated at build time against the schema in
    `src/content.config.ts`:
@@ -52,7 +61,7 @@ Node version automatically.
    draft: false
    ---
 
-   Your post body in Markdown starts here.
+   Your post body starts here.
    ```
 
    - `title` (required) — the headline.
@@ -60,32 +69,41 @@ Node version automatically.
    - `pubDate` (required) — `YYYY-MM-DD`.
    - `updatedDate` (optional) — set if you revise a published post.
    - `tags` (optional) — list of strings; defaults to empty.
+   - `heroImage` / `heroAlt` (optional) — lead photo path + alt text.
    - `draft` (optional) — `true` keeps the post out of the built site.
 3. Save. With `npm run dev` running, the post appears immediately.
 
-A working example lives at `src/content/blog/welcome.md`.
+A working example lives at `src/content/blog/welcome.mdoc`.
+
+> **Changing the post schema?** The fields live in two files that must stay in
+> sync: `src/content.config.ts` (build validation) and `keystatic.config.ts`
+> (the editor). A compile-time guard, `src/schema-parity.ts`, fails
+> `npm run check` if they drift — update both, then run the check.
 
 ---
 
-## Deploying to Cloudflare Pages (free tier)
+## Deploying to Cloudflare Workers (free tier)
 
-This is a one-time setup; after it, every `git push` auto-deploys.
+The site deploys as a **Cloudflare Worker serving static assets** — the worker
+config lives in `wrangler.jsonc`, and the live URL is the `site` value in
+`astro.config.mjs`.
 
-1. Push this repo to GitHub.
-2. Sign in to the [Cloudflare dashboard](https://dash.cloudflare.com) →
-   **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-3. Select this repository.
-4. Set the build configuration:
-   - **Framework preset:** Astro
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-   - **Node version:** set an environment variable `NODE_VERSION` = `22`
-     (Workers & Pages → your project → Settings → Variables).
-5. Save and deploy. Cloudflare gives you a `*.pages.dev` URL.
-6. Update `site` in `astro.config.mjs` to that URL (or your custom domain) and
-   commit, so canonical links and Open Graph URLs are correct.
+Deploy from your machine:
 
-Reference: [Cloudflare Pages + Astro guide](https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site/).
+```bash
+npx wrangler login   # one-time browser sign-in to Cloudflare
+npm run deploy       # builds, then `wrangler deploy`s dist/
+```
+
+If the repo is connected to Cloudflare **Workers Builds** (Git integration in
+the Cloudflare dashboard), every push to `main` builds and deploys
+automatically instead.
+
+If the URL ever changes (e.g. a custom domain), update `site` in
+`astro.config.mjs` and commit, so canonical links and Open Graph URLs stay
+correct.
+
+Reference: [Cloudflare Workers + Astro guide](https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/).
 
 ---
 
@@ -110,10 +128,13 @@ explain *what* and *why*.** If they ever disagree, fix the docs.
 
 ```
 .
-├── astro.config.mjs       # Astro configuration (site URL, output mode)
+├── astro.config.mjs       # Astro configuration (site URL, integrations)
+├── keystatic.config.ts    # the visual editor's schema (mirrors content.config.ts)
+├── wrangler.jsonc         # Cloudflare Workers deploy config
 ├── src/
 │   ├── content.config.ts  # post schema (typed frontmatter)
-│   ├── content/blog/      # the posts (Markdown)
+│   ├── schema-parity.ts   # compile-time guard: the two schemas above must match
+│   ├── content/blog/      # the posts (Markdoc .mdoc files)
 │   ├── layouts/           # page shells (Base, Post)
 │   ├── components/        # reusable UI (Header, Footer, dates)
 │   ├── pages/             # routes (index, about, blog/)

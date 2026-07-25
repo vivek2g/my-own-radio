@@ -14,10 +14,12 @@ join. Even while it's a solo project, following these makes onboarding painless.
 
 ## Git workflow
 
-- `main` is the deployable branch. Cloudflare Pages builds whatever is on
-  `main`.
+- `main` is the deployable branch; it goes live on Cloudflare Workers (via
+  `npm run deploy` or the Workers Builds Git integration).
 - For anything non-trivial, work on a branch and open a pull request, even
-  solo — it gives you a build preview and a review surface.
+  solo — it gives you a review surface, and CI (`.github/workflows/ci.yml`)
+  runs `npm run check` + `npm run build` on every push and PR so schema drift
+  or bad frontmatter can't reach `main` unnoticed.
 - Suggested commit message style (Conventional Commits):
   - `feat: add semantic search to journal`
   - `post: manali trek day 1`
@@ -47,4 +49,4 @@ See the README's "Writing a post" section. Rules of thumb:
 1. `npm run dev` shows the change working locally.
 2. `npm run build` succeeds with no errors.
 3. `npm run check` passes.
-4. Committed with a clear message and pushed; Cloudflare preview looks right.
+4. Committed with a clear message and pushed; CI is green.
