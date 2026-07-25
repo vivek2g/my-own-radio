@@ -6,7 +6,22 @@ import Search from './Search.astro';
 
 <header class="site-header font-ui">
   <div class="bar">
-    <a href="/" class="brand"><span class="brand__dot" aria-hidden="true"></span>My Own Radio</a>
+    <div class="bar__left">
+      <!-- Hidden until the script runs, so a visitor without JavaScript never
+           sees a control that can't work — they keep a permanently open rail. -->
+      <button
+        id="rail-toggle"
+        class="icon-btn"
+        type="button"
+        aria-controls="section-rail"
+        aria-expanded="true"
+        aria-label="Hide sections"
+        hidden
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <a href="/" class="brand"><span class="brand__dot" aria-hidden="true"></span>My Own Radio</a>
+    </div>
     <nav aria-label="Site tools">
       <Search />
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"></button>
@@ -34,6 +49,21 @@ import Search from './Search.astro';
     min-height: var(--header-height);
     padding-block: 0.6rem;
     padding-inline: clamp(1.1rem, 4vw, 2.75rem);
+  }
+  /* Hamburger + brand travel together at the far left. */
+  .bar__left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+  /* Load-bearing, despite looking redundant: `.icon-btn` sets `display:
+     inline-flex`, and an author rule beats the browser's own `[hidden] {
+     display: none }`. Without this the button would stay visible while the
+     `hidden` attribute is set — i.e. for everyone without JavaScript.
+     Search.astro carries the same guard for the same reason. */
+  #rail-toggle[hidden] {
+    display: none;
   }
   .brand {
     font-family: var(--font-display);
@@ -95,4 +125,37 @@ import Search from './Search.astro';
     });
 
   render();
+
+  // Section rail toggle. The state lives in a data attribute on <html> (the CSS
+  // in Sidebar/BaseLayout keys off it) and in localStorage, which BaseLayout's
+  // inline script re-applies before paint on the next page — without that, the
+  // rail would reopen on every navigation.
+  const railBtn = document.getElementById('rail-toggle');
+
+  if (railBtn) {
+    const railCollapsed = () => root.getAttribute('data-rail') === 'collapsed';
+
+    const renderRailBtn = () => {
+      const collapsed = railCollapsed();
+      railBtn.setAttribute('aria-expanded', String(!collapsed));
+      railBtn.setAttribute('aria-label', collapsed ? 'Show sections' : 'Hide sections');
+    };
+
+    railBtn.addEventListener('click', () => {
+      const next = railCollapsed() ? 'shown' : 'collapsed';
+      if (next === 'collapsed') {
+        root.setAttribute('data-rail', 'collapsed');
+      } else {
+        root.removeAttribute('data-rail');
+      }
+      try {
+        localStorage.setItem('rail', next);
+      } catch (e) {}
+      renderRailBtn();
+    });
+
+    // Only reveal the control once we know the script is running.
+    railBtn.hidden = false;
+    renderRailBtn();
+  }
 </script>

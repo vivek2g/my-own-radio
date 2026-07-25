@@ -355,3 +355,33 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   multi-category posts (rejected as above); generic tag pages (a good future
   addition, but it answers a different question — "more like this" rather than
   "where does this belong").
+
+## 23. UI preferences live on `<html>` and are applied before paint
+
+- **Status:** Accepted (generalises the theme mechanism from #6 to a second
+  preference).
+- **Context:** A hamburger in the header now collapses the section rail (#22).
+  On a **static multi-page site every navigation is a full page load**, so a
+  collapse toggle held only in memory would spring back open on the next click,
+  making the feature pointless. Storing it isn't enough either: applying it
+  after the page has rendered means every load flashes the rail open before it
+  collapses.
+- **Decision:** Any persisted UI preference is (a) written to `localStorage`,
+  (b) reflected as a `data-` attribute on `<html>` that CSS keys off, and (c)
+  re-applied by the single inline `<script is:inline>` in `BaseLayout`'s
+  `<head>`, which runs before first paint. Currently two such preferences:
+  `data-theme` and `data-rail`.
+- **Why:** `<html>` is the only element that exists before the body renders, so
+  it's the only place an attribute can drive styling with no flash. Keeping all
+  of them in one inline script means there is exactly one blocking script in
+  `<head>`, and adding a third preference is a couple of lines rather than a
+  new pattern.
+- **Trade-off:** That inline script is render-blocking and cannot be bundled or
+  deferred — the cost of avoiding a flash. It's a few lines, wrapped in
+  `try/catch` so that a browser with storage disabled degrades to the default
+  rather than erroring.
+- **Note on defaults:** the absence of the attribute is always the sensible
+  default (theme follows the device; rail is shown), so a visitor with no
+  JavaScript gets a working site and never sees the toggle — the button stays
+  `hidden` until its script runs, the same progressive-enhancement rule the
+  search button follows (#20).
