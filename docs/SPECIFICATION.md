@@ -77,10 +77,15 @@ What the site must do, framed as capabilities rather than code:
 
 ### Explicit non-goals (Phase 1)
 
-Comments, user accounts, search, analytics, a CMS, server-side logic, and any
-audio/radio features are **out of scope for Phase 1**. They are not forbidden
-forever — see §9 and `ROADMAP.md` — but they are not built yet, and the system
-should stay simple until they're genuinely needed.
+Comments, user accounts, analytics, server-side logic, and any audio/radio
+features are **out of scope for Phase 1**. They are not forbidden forever — see
+§9 and `ROADMAP.md` — but they are not built yet, and the system should stay
+simple until they're genuinely needed.
+
+Two former non-goals have since been built, both without a server: a **local
+editor** (Keystatic, dev-only — `DECISIONS.md` #17) and **keyword search** over
+post metadata (a build-time index plus a small script — `DECISIONS.md` #20).
+*Semantic* search over post bodies remains future work (`ROADMAP.md` Phase 1.5).
 
 ---
 
@@ -127,6 +132,7 @@ URL).
 | Journal | `/blog/` | Full list of published posts (with thumbnails), newest first |
 | Post | `/blog/<slug>/` | A single post; one page generated per post |
 | About | `/about/` | Who the author is and what the project is |
+| Search index | `/search-index.json` | Build-time data file the header's search panel fetches; not a page |
 
 `<slug>` is the post's URL-safe identifier, derived from its filename. URLs are
 intended to be **stable** — once published, a post's URL should not change, so
