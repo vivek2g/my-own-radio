@@ -71,12 +71,23 @@ const isCurrent = (href: string) => {
 <style>
   .rail {
     grid-area: rail;
+    /* The grid track animates to zero when collapsed (see BaseLayout); these
+       let this box shrink with it and clip its contents rather than spilling. */
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.18s ease;
   }
-  /* Hidden by the header's hamburger. One rule covers both layouts — the
-     desktop column and the mobile strip. The attribute is set on <html> before
-     paint (see BaseLayout) so it survives navigation without flashing. */
+  /* Collapsed by the header's hamburger. The attribute is set on <html> before
+     paint (see BaseLayout) so it survives navigation without flashing.
+     `visibility` is delayed until the track has finished shrinking, so the
+     links leave the tab order only once they're actually gone. */
   :root[data-rail='collapsed'] .rail {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease, visibility 0s linear var(--rail-collapse);
   }
   .rail ul {
     list-style: none;
@@ -109,7 +120,13 @@ const isCurrent = (href: string) => {
       position: sticky;
       top: calc(var(--header-height) + 1.75rem);
       align-self: start;
-      padding-right: 1rem;
+    }
+    /* The whole gap to the article lives here, inside the clipped box, so it
+       disappears with the rail instead of leaving a sliver behind. This
+       replaces both the old grid `gap` (1.5rem) and the old `.rail`
+       padding-right (1rem) — hence 2.5rem, not 1.5rem. */
+    .rail nav {
+      padding-right: 2.5rem;
     }
     .rail li + li {
       margin-top: 0.15rem;
@@ -124,7 +141,9 @@ const isCurrent = (href: string) => {
 
   /* Phones and tablets: one scrollable row of section links. */
   @media (max-width: 899px) {
-    .rail {
+    /* Rule and spacing sit on the inner element so the clipped .rail box takes
+       them with it when collapsed — otherwise a stray line would remain. */
+    .rail nav {
       border-bottom: 1px solid var(--color-border);
       margin-bottom: 1.5rem;
     }
@@ -145,6 +164,7 @@ const isCurrent = (href: string) => {
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .rail,
     .rail__link {
       transition: none;
     }

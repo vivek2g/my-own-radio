@@ -20,7 +20,7 @@ const { heading, blurb, posts, showCategory = true, activeSection } = Astro.prop
 ---
 
 <BaseLayout title={`${heading} - My Own Radio`} description={blurb} activeSection={activeSection}>
-  <div class="page">
+  <div class="container">
     <header class="page__head">
       <h1 class="page__title">{heading}</h1>
       <p class="page__blurb">{blurb}</p>
@@ -35,10 +35,6 @@ const { heading, blurb, posts, showCategory = true, activeSection } = Astro.prop
 </BaseLayout>
 
 <style>
-  .page {
-    max-width: var(--max-width);
-    padding-inline: 1.4rem;
-  }
   .page__head {
     margin-block: 1rem 2rem;
   }
@@ -53,11 +49,5 @@ const { heading, blurb, posts, showCategory = true, activeSection } = Astro.prop
   }
   .page__empty {
     color: var(--color-muted);
-  }
-
-  @media (min-width: 900px) {
-    .page {
-      padding-inline: 0;
-    }
   }
 </style>
