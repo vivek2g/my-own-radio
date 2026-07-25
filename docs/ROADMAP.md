@@ -35,6 +35,10 @@ honest, well-made posts matters more than additional functionality.
 **Goal:** improve the reading experience and add a single, well-built AI feature
 that doubles as the seed of the radio — without sprawling.
 
+Already done: **keyword search** in the header — a build-time index plus a small
+script, no server (`DECISIONS.md` #20). It matches titles, descriptions, and
+tags; matching post *bodies* is left to the embeddings work below.
+
 Candidates (pick deliberately, don't build all):
 
 - Per-post hero images and image handling (captions, optimized images).

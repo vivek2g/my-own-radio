@@ -277,3 +277,33 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   (rejected: needs a TS runner and duplicates what the type-checker gives for
   free); discipline alone (rejected: it already failed — this decision exists
   because the docs drifted).
+
+## 20. Keyword search: a build-time index plus a vanilla-JS panel
+
+- **Status:** Accepted.
+- **Context:** Readers needed a way to find a post by keyword. `ROADMAP.md`
+  Phase 1.5 anticipates a *semantic* search built on embeddings; this is the
+  much smaller first step, and it had to fit the static architecture (#2, #7).
+  Note that React is a dev-only dependency here (#17), so an island framework
+  was not available for production pages anyway.
+- **Decision:** Generate `/search-index.json` at build time (an Astro endpoint,
+  `src/pages/search-index.json.ts`) holding each published post's title,
+  description, tags, and URL. The header's `Search.astro` component fetches it
+  lazily the first time the panel is opened and filters it in the browser.
+  Matching is case-insensitive, and every whitespace-separated term must match,
+  so extra words narrow the results. Each result is a real `<a href>`.
+- **Why:** No server, no framework, no index bytes in any page until a visitor
+  actually searches — the reading experience is unchanged for everyone who
+  doesn't. Results being plain links means navigation works by the browser's own
+  rules rather than bespoke JavaScript.
+- **Trade-off / when to revisit:** Post *bodies* are not indexed, so search
+  finds a post by its title, summary, or tags but not by a phrase buried in the
+  text. That keeps the index small and is the right trade at this scale; when
+  the archive grows or full-text matching is wanted, the natural upgrade is the
+  Phase 1.5 embeddings index — which this endpoint is a sensible place to grow
+  into.
+- **Alternatives:** Embedding the index in every page's HTML (rejected: every
+  reader pays for a feature few use, and it grows with the archive); a search
+  library such as Pagefind or Fuse.js (rejected for now: a dependency and a
+  bundle for what a dozen lines of filtering do at this size); a server-side
+  search endpoint (rejected: violates #2/#7).

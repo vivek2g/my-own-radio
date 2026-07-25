@@ -2,13 +2,11 @@
 // Home page (option 2: "lead story + list").
 // The newest post leads with its image and a larger headline; the rest follow
 // as compact entries with a small thumbnail.
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import { getPublishedPosts } from '../lib/posts';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
-);
+const posts = await getPublishedPosts();
 
 const [lead, ...rest] = posts;
 const restToShow = rest.slice(0, 6);

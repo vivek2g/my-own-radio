@@ -1,6 +1,8 @@
 ---
 // Site header / primary navigation.
 // Edit the links here to add or rename pages.
+import Search from './Search.astro';
+
 const links = [
   { href: '/', label: 'Home' },
   { href: '/blog', label: 'Journal' },
@@ -13,7 +15,8 @@ const links = [
     <a href="/" class="brand"><span class="brand__dot" aria-hidden="true"></span>My Own Radio</a>
     <nav>
       {links.map((link) => <a href={link.href}>{link.label}</a>)}
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme"></button>
+      <Search />
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"></button>
     </nav>
   </div>
 </header>
@@ -67,24 +70,6 @@ const links = [
   nav a:hover {
     color: var(--color-accent);
     text-decoration: none;
-  }
-  .theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    padding: 0;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-muted);
-    cursor: pointer;
-    transition: color 0.15s ease, border-color 0.15s ease;
-  }
-  .theme-toggle:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
   }
 </style>
 

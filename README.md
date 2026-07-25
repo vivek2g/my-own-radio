@@ -137,7 +137,7 @@ explain *what* and *why*.** If they ever disagree, fix the docs.
 │   ├── content/blog/      # the posts (Markdoc .mdoc files)
 │   ├── layouts/           # page shells (Base, Post)
 │   ├── components/        # reusable UI (Header, Footer, dates)
-│   ├── pages/             # routes (index, about, blog/)
+│   ├── pages/             # routes (index, about, blog/, search-index.json)
 │   └── styles/global.css  # design tokens + base styles
 └── public/                # static files served as-is (favicon, images)
 ```
