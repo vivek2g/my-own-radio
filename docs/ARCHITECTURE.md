@@ -64,7 +64,8 @@ static page each. The post body is rendered via `render()` from `astro:content`.
   tags). Every page wraps its content in this.
 - `layouts/PostLayout.astro` — adds the post title, date, and tags around the
   article body.
-- `components/` — small reusable pieces (`Header`, `Footer`, `FormattedDate`).
+- `components/` — small reusable pieces (`Header`, `Footer`, `FormattedDate`,
+  `Search`).
 
 ## Styling
 
@@ -102,13 +103,34 @@ The editor's schema (`keystatic.config.ts`) mirrors the content schema
 (`src/content.config.ts`). `src/schema-parity.ts` asserts at type-check time
 that the two declare the same fields, so `npm run check` fails if they drift.
 
+## Search (a worked example of "complexity at the edges")
+
+Site search is the clearest illustration of how features get added here without
+giving up the static core:
+
+- **Build time:** `src/pages/search-index.json.ts` is an Astro endpoint that
+  runs during the build and writes a plain `/search-index.json` file listing
+  every published post's title, description, tags, and URL.
+- **Browser:** `src/components/Search.astro` renders a button in the header and
+  a dialog. The first time a visitor opens it, a small script fetches that JSON
+  once and filters it in memory. Results are ordinary `<a href>` links, so
+  choosing one is a normal navigation.
+
+There is no search server, no index at request time, and no framework — and
+because the index is fetched only on demand, pages carry none of its weight.
+Note the Astro gotcha this design works around: scoped `<style>` rules only
+apply to elements present in the component's markup, so the result row lives in
+a `<template>` that the script clones rather than being built with
+`createElement`.
+
 ## What deliberately does NOT exist yet
 
 - No JavaScript framework in production, no client-side routing, no state
   management. (React exists only inside the dev-time Keystatic editor.)
 - No CMS backend — posts are files in Git, which is the source of truth; the
   Keystatic editor is a local editing convenience, not a content server.
-- No analytics, comments, or search yet.
+- No analytics or comments. Search exists, but only keyword matching over post
+  metadata — no semantic/embeddings search yet.
 
 These are intentional omissions to keep Phase 1 shippable. Each can be added in
 isolation when there's a reason to.
@@ -150,7 +172,7 @@ Pages (routes)          src/pages/        — what URLs exist; fetch content
    │
 Layouts                 src/layouts/      — page shells (Base, Post)
    │
-Components              src/components/    — reusable UI (Header, Footer, FormattedDate)
+Components              src/components/    — reusable UI (Header, Footer, FormattedDate, Search)
    │
 Content + tokens        src/content/, src/styles/  — the data and the design vars
 ```

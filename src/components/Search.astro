@@ -1,0 +1,440 @@
+---
+// Site search — a keyword filter over post titles, descriptions, and tags.
+//
+// How it stays static: the index is a build-time file
+// (src/pages/search-index.json.ts) that this component fetches the first time
+// the panel opens. There is no search server and no framework; the whole thing
+// is one small script. Each result is a real <a href>, so clicking one is an
+// ordinary link navigation to the post.
+//
+// Progressive enhancement: the button is hidden until the script runs, so a
+// visitor without JavaScript never sees a control that cannot work.
+---
+
+<div class="search">
+  <button
+    id="search-open"
+    class="icon-btn search__btn"
+    type="button"
+    aria-label="Search posts"
+    aria-haspopup="dialog"
+    aria-expanded="false"
+    hidden
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  </button>
+
+  <div id="search-panel" class="search__panel" hidden>
+    <div class="search__backdrop" data-search-dismiss></div>
+    <div class="search__dialog" role="dialog" aria-modal="true" aria-label="Search posts">
+      <div class="search__field">
+        <svg class="search__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input
+          id="search-input"
+          class="search__input font-ui"
+          type="search"
+          placeholder="Search posts by keyword…"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+        />
+        <button id="search-close" class="search__close" type="button" aria-label="Close search">Esc</button>
+      </div>
+
+      <ul id="search-results" class="search__results" role="listbox" aria-label="Search results"></ul>
+      <p id="search-status" class="search__status" role="status">Type to search posts.</p>
+
+      {/* One result row, cloned by the script for each match. It lives in the
+          markup (rather than being built with createElement) so that Astro's
+          scoped styles above actually apply to it — scoping is added at build
+          time and never reaches nodes invented at runtime. */}
+      <template id="search-result-template">
+        {/* role="option" and the id sit on the <a>, not the <li>: the element
+            referenced by aria-activedescendant must be the one carrying the
+            option role. tabindex="-1" keeps results out of the Tab sequence —
+            in a combobox, focus stays in the input and the arrow keys move the
+            selection — while leaving them clickable for mouse users. */}
+        <li role="presentation">
+          <a class="search__result" role="option" aria-selected="false" tabindex="-1">
+            <p class="search__result-title"></p>
+            <p class="search__result-desc"></p>
+          </a>
+        </li>
+      </template>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search {
+    display: contents;
+  }
+  /* Shape and colours come from the shared .icon-btn in global.css, so this
+     button and the theme toggle stay identical. */
+  .search__btn[hidden] {
+    display: none;
+  }
+
+  .search__panel {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+  }
+  .search__panel[hidden] {
+    display: none;
+  }
+  .search__backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-text) 45%, transparent);
+  }
+  .search__dialog {
+    position: relative;
+    width: min(38rem, calc(100vw - 2rem));
+    margin: clamp(3rem, 12vh, 8rem) auto 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: 0 18px 50px color-mix(in srgb, var(--color-text) 22%, transparent);
+    overflow: hidden;
+    animation: search-in 0.16s ease;
+  }
+  @keyframes search-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .search__field {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .search__field-icon {
+    color: var(--color-muted);
+    flex: none;
+  }
+  .search__input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 1rem;
+    padding: 0.15rem 0;
+  }
+  .search__input:focus {
+    outline: none;
+  }
+  .search__input::placeholder {
+    color: var(--color-muted);
+  }
+  /* The browser's default clear button clashes with the editorial look. */
+  .search__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .search__close {
+    flex: none;
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 0.2rem 0.45rem;
+    cursor: pointer;
+  }
+  .search__close:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .search__results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: min(24rem, 55vh);
+    overflow-y: auto;
+  }
+  .search__results:empty {
+    display: none;
+  }
+  .search__results li + li {
+    border-top: 1px solid var(--color-border);
+  }
+  .search__result {
+    display: block;
+    padding: 0.8rem 1rem;
+    color: inherit;
+  }
+  .search__result:hover,
+  .search__result[data-active='true'] {
+    background: var(--color-bg);
+    text-decoration: none;
+  }
+  .search__result-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text);
+    margin: 0 0 0.2rem;
+    line-height: 1.25;
+  }
+  .search__result:hover .search__result-title,
+  .search__result[data-active='true'] .search__result-title {
+    color: var(--color-accent);
+  }
+  .search__result-desc {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+    /* Keep every row the same height: one line, ellipsised. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .search__status {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .search__status[hidden] {
+    display: none;
+  }
+
+  /* Honour a reader's request for less motion (AGENTS.md house rule). */
+  /* The button's own transition is handled with .icon-btn in global.css. */
+  @media (prefers-reduced-motion: reduce) {
+    .search__dialog {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .search__dialog {
+      margin-top: 0;
+      width: 100vw;
+      min-height: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+</style>
+
+<script>
+  type SearchEntry = {
+    title: string;
+    description: string;
+    tags: string[];
+    url: string;
+  };
+
+  const openBtn = document.getElementById('search-open');
+  const panel = document.getElementById('search-panel');
+  const dialog = panel?.querySelector<HTMLElement>('.search__dialog');
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const results = document.getElementById('search-results');
+  const status = document.getElementById('search-status');
+  const closeBtn = document.getElementById('search-close');
+  const template = document.getElementById('search-result-template') as HTMLTemplateElement | null;
+
+  if (openBtn && panel && dialog && input && results && status && closeBtn && template) {
+    // Only reveal the control once we know the script is running.
+    openBtn.hidden = false;
+
+    let index: SearchEntry[] | null = null;
+    let matches: SearchEntry[] = [];
+    let activeIndex = -1;
+    let lastFocused: HTMLElement | null = null;
+
+    const setStatus = (message: string) => {
+      status.textContent = message;
+      status.hidden = message === '';
+    };
+
+    // Fetched once per page load, on first open — search costs nothing until used.
+    const loadIndex = async (): Promise<SearchEntry[]> => {
+      if (index) return index;
+      const response = await fetch('/search-index.json');
+      if (!response.ok) throw new Error(`Search index request failed: ${response.status}`);
+      index = (await response.json()) as SearchEntry[];
+      return index;
+    };
+
+    // Every whitespace-separated term must appear somewhere in the post's
+    // title, description, or tags — so "himalaya trek" narrows rather than widens.
+    const findMatches = (query: string, entries: SearchEntry[]): SearchEntry[] => {
+      const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+      if (terms.length === 0) return [];
+      return entries.filter((entry) => {
+        const haystack = [entry.title, entry.description, entry.tags.join(' ')]
+          .join(' ')
+          .toLowerCase();
+        return terms.every((term) => haystack.includes(term));
+      });
+    };
+
+    const setActive = (next: number) => {
+      const items = results.querySelectorAll<HTMLAnchorElement>('.search__result');
+      activeIndex = next;
+      items.forEach((item, i) => {
+        const isActive = i === activeIndex;
+        item.dataset.active = String(isActive);
+        item.setAttribute('aria-selected', String(isActive));
+        if (isActive) {
+          input.setAttribute('aria-activedescendant', item.id);
+          item.scrollIntoView({ block: 'nearest' });
+        }
+      });
+      if (activeIndex < 0) input.removeAttribute('aria-activedescendant');
+    };
+
+    const render = () => {
+      results.replaceChildren();
+
+      matches.forEach((entry, i) => {
+        const row = template.content.cloneNode(true) as DocumentFragment;
+        const li = row.querySelector('li');
+        // A real link: clicking (or Enter) navigates to the post the normal way.
+        const link = row.querySelector<HTMLAnchorElement>('.search__result');
+        const title = row.querySelector('.search__result-title');
+        const desc = row.querySelector('.search__result-desc');
+        if (!li || !link || !title || !desc) return;
+
+        link.id = `search-result-${i}`;
+        link.href = entry.url;
+        title.textContent = entry.title;
+        desc.textContent = entry.description;
+        link.addEventListener('mouseenter', () => setActive(i));
+        results.append(li);
+      });
+
+      input.setAttribute('aria-expanded', String(matches.length > 0));
+      setActive(matches.length > 0 ? 0 : -1);
+    };
+
+    const runSearch = async () => {
+      const query = input.value.trim();
+      if (query === '') {
+        matches = [];
+        render();
+        setStatus('Type to search posts.');
+        return;
+      }
+
+      let entries: SearchEntry[];
+      try {
+        entries = await loadIndex();
+      } catch {
+        matches = [];
+        render();
+        setStatus('Search is unavailable right now.');
+        return;
+      }
+
+      // The input may have changed while the index was loading.
+      if (input.value.trim() !== query) return;
+
+      matches = findMatches(query, entries);
+      render();
+      setStatus(
+        matches.length === 0
+          ? `No posts match “${query}”.`
+          : `${matches.length} ${matches.length === 1 ? 'post' : 'posts'} found.`
+      );
+    };
+
+    const openSearch = () => {
+      if (!panel.hidden) return;
+      lastFocused = document.activeElement as HTMLElement | null;
+      panel.hidden = false;
+      openBtn.setAttribute('aria-expanded', 'true');
+      input.focus();
+      input.select();
+      // Warm the index while the visitor is still typing their first letter.
+      void loadIndex().catch(() => {});
+    };
+
+    const closeSearch = () => {
+      if (panel.hidden) return;
+      panel.hidden = true;
+      openBtn.setAttribute('aria-expanded', 'false');
+      input.value = '';
+      matches = [];
+      render();
+      setStatus('Type to search posts.');
+      lastFocused?.focus();
+    };
+
+    openBtn.addEventListener('click', openSearch);
+    closeBtn.addEventListener('click', closeSearch);
+    panel.querySelector('[data-search-dismiss]')?.addEventListener('click', closeSearch);
+    input.addEventListener('input', () => void runSearch());
+
+    input.addEventListener('keydown', (event) => {
+      if (matches.length === 0) return;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setActive((activeIndex + 1) % matches.length);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setActive((activeIndex - 1 + matches.length) % matches.length);
+      } else if (event.key === 'Enter' && activeIndex >= 0) {
+        event.preventDefault();
+        window.location.href = matches[activeIndex].url;
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel.hidden) {
+        closeSearch();
+        return;
+      }
+
+      // "/" and Cmd/Ctrl-K open search, but never while the visitor is typing
+      // somewhere else on the page.
+      const target = event.target as HTMLElement | null;
+      const typing =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable === true;
+
+      if ((event.key === '/' && !typing) || (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey))) {
+        event.preventDefault();
+        openSearch();
+      }
+    });
+
+    // Keep focus inside the dialog while it is open.
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      // Result links are tabindex="-1", so the trap spans just the input and
+      // the close button.
+      const focusable = dialog.querySelectorAll<HTMLElement>(
+        'input, button, a[href]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  }
+</script>

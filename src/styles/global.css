@@ -112,6 +112,32 @@ h1, h2, h3 {
   color: var(--color-muted);
 }
 
+/* The small round icon buttons in the header (search, theme toggle). Shared so
+   the pair always stays visually identical. */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.icon-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn {
+    transition: none;
+  }
+}
+
 img {
   max-width: 100%;
   height: auto;
