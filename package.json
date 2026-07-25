@@ -8,11 +8,14 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "12",
     "@astrojs/markdoc": "^0.15.11",
     "@astrojs/react": "^6.0.1",
     "@keystatic/astro": "^5.2.0",
@@ -23,6 +26,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "wrangler": "^4.103.0"
   }
 }

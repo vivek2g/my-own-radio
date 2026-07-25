@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import markdoc from '@astrojs/markdoc';
 import react from '@astrojs/react';
 import keystatic from '@keystatic/astro';
+import cloudflare from '@astrojs/cloudflare';
 
 // Keystatic's editor (and its React admin UI) run ONLY during local dev, so the
 // production build stays a pure static site that needs no server adapter.
@@ -15,5 +16,6 @@ const isDev = process.argv.includes('dev');
 export default defineConfig({
   site: 'https://my-own-radio.vivek-k2g.workers.dev',
   output: 'static',
+  adapter: cloudflare(),
   integrations: [markdoc(), ...(isDev ? [react(), keystatic()] : [])],
 });
