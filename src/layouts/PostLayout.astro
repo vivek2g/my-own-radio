@@ -4,20 +4,24 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import { categoryLabel } from '../lib/categories';
 
 interface Props {
   post: CollectionEntry<'blog'>;
 }
 
 const { post } = Astro.props;
-const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = post.data;
+const { title, description, category, pubDate, updatedDate, tags, heroImage, heroAlt } =
+  post.data;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} activeSection={category}>
   <div class="container">
   <article>
     <header class="post-header">
       <p class="kicker meta">
+        <a class="meta__cat" href={`/${category}/`}>{categoryLabel(category)}</a>
+        <span aria-hidden="true"> &middot; </span>
         <FormattedDate date={pubDate} />
         {updatedDate && <span> &middot; updated <FormattedDate date={updatedDate} /></span>}
       </p>
@@ -34,7 +38,7 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
       <slot />
     </div>
   </article>
-  <p class="font-ui"><a href="/blog">&larr; Back to the journal</a></p>
+  <p class="font-ui"><a href={`/${category}/`}>&larr; Back to {categoryLabel(category)}</a></p>
   </div>
 </BaseLayout>
 
@@ -51,6 +55,10 @@ const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = p
   }
   .meta {
     margin: 0;
+  }
+  .meta__cat {
+    color: var(--color-accent);
+    font-weight: 500;
   }
   .dek {
     font-size: var(--step-1);

@@ -1,0 +1,118 @@
+---
+// The standard post list: a bold headline, the excerpt in normal weight, and
+// a small thumbnail on the right. Used by the home page, the full archive, and
+// every category page, so those three can't drift apart visually.
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import { categoryLabel } from '../lib/categories';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+  // Category pages already say which section you're in, so they hide the label.
+  showCategory?: boolean;
+}
+
+const { posts, showCategory = true } = Astro.props;
+
+// Shown when a post has no heroImage of its own.
+const DEFAULT_IMAGE = '/images/post-default.svg';
+---
+
+<ul class="posts">
+  {posts.map((post) => (
+    <li>
+      <a class="post" href={`/blog/${post.id}/`}>
+        <div class="post__text">
+          <p class="kicker post__meta">
+            {showCategory && (
+              <>
+                <span class="post__cat">{categoryLabel(post.data.category)}</span>
+                <span aria-hidden="true"> &middot; </span>
+              </>
+            )}
+            <FormattedDate date={post.data.pubDate} />
+          </p>
+          <h2 class="post__title">{post.data.title}</h2>
+          <p class="post__excerpt">{post.data.description}</p>
+        </div>
+        <img
+          class="post__img"
+          src={post.data.heroImage ?? DEFAULT_IMAGE}
+          alt={post.data.heroAlt ?? ''}
+          loading="lazy"
+        />
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .post {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 112px;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+    color: inherit;
+  }
+  .post:hover {
+    text-decoration: none;
+  }
+  .post__text {
+    min-width: 0;
+  }
+  .post__meta {
+    margin: 0 0 0.4rem;
+  }
+  .post__cat {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+  /* The bold headline. */
+  .post__title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.35rem;
+    line-height: 1.25;
+  }
+  .post:hover .post__title {
+    color: var(--color-accent);
+  }
+  /* The supporting text: normal weight, quieter colour. */
+  .post__excerpt {
+    font-weight: 400;
+    color: var(--color-muted);
+    margin: 0;
+    line-height: 1.6;
+    /* Two lines maximum, so rows stay a predictable height. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post__img {
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 560px) {
+    .post {
+      grid-template-columns: minmax(0, 1fr) 84px;
+      gap: 1rem;
+      padding: 1.4rem 0;
+    }
+    .post__img {
+      width: 84px;
+      height: 84px;
+    }
+  }
+</style>

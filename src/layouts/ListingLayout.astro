@@ -1,0 +1,63 @@
+---
+// Shared shell for any page that is "a heading, a line of context, then a list
+// of posts" — the full archive and every category page. Keeping it in one place
+// means those pages can't drift apart in spacing or type.
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+
+interface Props {
+  heading: string;
+  blurb: string;
+  posts: CollectionEntry<'blog'>[];
+  // Category pages already say which section you're in, so they hide the label.
+  showCategory?: boolean;
+  // Which rail item to mark as current (defaults to matching on the URL).
+  activeSection?: string;
+}
+
+const { heading, blurb, posts, showCategory = true, activeSection } = Astro.props;
+---
+
+<BaseLayout title={`${heading} - My Own Radio`} description={blurb} activeSection={activeSection}>
+  <div class="page">
+    <header class="page__head">
+      <h1 class="page__title">{heading}</h1>
+      <p class="page__blurb">{blurb}</p>
+    </header>
+
+    {posts.length === 0 ? (
+      <p class="page__empty">Nothing here yet — the first one is on its way.</p>
+    ) : (
+      <PostList posts={posts} showCategory={showCategory} />
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: var(--max-width);
+    padding-inline: 1.4rem;
+  }
+  .page__head {
+    margin-block: 1rem 2rem;
+  }
+  .page__title {
+    font-size: var(--step-3);
+    font-weight: 700;
+    margin: 0 0 0.4rem;
+  }
+  .page__blurb {
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .page__empty {
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 900px) {
+    .page {
+      padding-inline: 0;
+    }
+  }
+</style>
