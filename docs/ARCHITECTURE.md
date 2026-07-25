@@ -5,13 +5,15 @@ new developer (or future-you) can change it confidently.
 
 ## The big picture
 
-This is a **static site**. At build time, Astro reads the Markdown posts and the
+This is a **static site**. At build time, Astro reads the Markdoc posts and the
 `.astro` page files and produces plain HTML/CSS in `dist/`. There is no server
-and no database at runtime — Cloudflare just serves files from its CDN. That's
-why hosting is free and the site is fast and hard to break.
+and no database at runtime — Cloudflare just serves files from its CDN (the
+site is deployed as a Cloudflare **Worker** whose only job is serving those
+static assets; see `wrangler.jsonc`). That's why hosting is free and the site
+is fast and hard to break.
 
 ```
-Markdown posts ─┐
+Markdoc posts ──┐
                 ├─►  astro build  ─►  dist/ (static HTML)  ─►  Cloudflare CDN
 .astro pages ───┘
 ```
@@ -38,8 +40,8 @@ Astro validates every post against the schema during the build. A missing
 If you've done schema validation on data pipelines, this is the same idea applied
 to content.
 
-Each post gets an `id` derived from its filename (e.g. `welcome.md` → `welcome`),
-which is also its URL slug.
+Each post gets an `id` derived from its filename (e.g. `welcome.mdoc` →
+`welcome`), which is also its URL slug.
 
 ## Routing
 
@@ -86,10 +88,26 @@ the editorial look. Component-specific styles live in scoped `<style>` blocks
 inside each `.astro` file; a few reading-specific rules (drop cap, blockquote,
 prose rhythm) live in `PostLayout.astro`.
 
+## The editor (Keystatic) — dev-only, files stay the source of truth
+
+Posts can be written in a visual editor, **Keystatic**, served at `/keystatic`
+— but only while `npm run dev` runs. It uses "local" storage: the editor reads
+and writes the `.mdoc` files on your disk, so Git remains the single source of
+truth and publishing is still commit + push. There is no CMS backend, no
+database, and no editor in production: `astro.config.mjs` includes the React +
+Keystatic integrations only when the `dev` command is running, so `astro build`
+produces the same pure static output as before.
+
+The editor's schema (`keystatic.config.ts`) mirrors the content schema
+(`src/content.config.ts`). `src/schema-parity.ts` asserts at type-check time
+that the two declare the same fields, so `npm run check` fails if they drift.
+
 ## What deliberately does NOT exist yet
 
-- No JavaScript framework, no client-side routing, no state management.
-- No CMS — posts are files in Git, which is the source of truth.
+- No JavaScript framework in production, no client-side routing, no state
+  management. (React exists only inside the dev-time Keystatic editor.)
+- No CMS backend — posts are files in Git, which is the source of truth; the
+  Keystatic editor is a local editing convenience, not a content server.
 - No analytics, comments, or search yet.
 
 These are intentional omissions to keep Phase 1 shippable. Each can be added in
@@ -105,7 +123,7 @@ It helps to separate what happens **when the site is built** from what happens
 At build time (on your machine or on Cloudflare):
 
 ```
-src/content/blog/*.md   ──┐
+src/content/blog/*.mdoc ──┐
                           ├─►  Astro reads + validates against the schema
 src/pages/*.astro       ──┤        (src/content.config.ts)
 src/layouts, components ──┘                │
@@ -146,8 +164,10 @@ widget = a component. This keeps edits local and predictable.
 - **A new page:** add a file to `src/pages/`. Its path becomes the URL.
 - **A new reusable element:** add a component to `src/components/` and use it in
   a layout or page.
-- **New post metadata:** add a field to the schema in `src/content.config.ts`;
-  it becomes available (and validated) on every post.
+- **New post metadata:** add the field to the schema in
+  `src/content.config.ts` **and** to `keystatic.config.ts` (so the editor can
+  set it); the parity guard in `src/schema-parity.ts` fails `npm run check`
+  until both agree.
 - **An interactive feature (island):** build it as a framework component (React,
   Svelte, etc.) and embed only that component in an otherwise-static page, with
   a directive telling Astro to make it interactive in the browser. The rest of
@@ -162,7 +182,8 @@ widget = a component. This keeps edits local and predictable.
 
 ## How to add common things (quick recipes)
 
-- **Publish a post:** create `src/content/blog/<slug>.md` with valid
+- **Publish a post:** use the Keystatic editor (`/keystatic` during `npm run
+  dev`) or create `src/content/blog/<slug>.mdoc` by hand with valid
   frontmatter. See `README.md` → "Writing a post."
 - **Change the color scheme:** edit the tokens in `src/styles/global.css` (light
   block and the dark block). Nothing else.

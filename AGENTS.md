@@ -15,8 +15,10 @@ deeper context, follow the links in "Documentation map" below.
 ## What this project is
 
 A personal, reading-first journal website (treks, travel, philosophy), built as
-a **static site** with **Astro**, content authored as **Markdown** in Git, hosted
-free on **Cloudflare Pages**. A later phase adds AI narration / a "radio." The
+a **static site** with **Astro**, content authored as **Markdoc** (`.mdoc`)
+files in Git — by hand or via the **Keystatic** editor at `/keystatic` during
+`npm run dev` — and hosted free on **Cloudflare Workers** (static assets). A
+later phase adds AI narration / a "radio." The
 guiding qualities: reading-first, owned/portable, simple by default, low-cost,
 understandable by a non-JavaScript author.
 
@@ -31,14 +33,16 @@ Prerequisites: Node.js at the version in `.nvmrc` (run `nvm use` if you use nvm)
 ```bash
 npm install        # install dependencies (first time, or when deps change)
 npm run dev        # local dev server with hot reload — use this to write/preview
+                   # (also serves the Keystatic editor at /keystatic — dev only)
 npm run build      # produce the static site in dist/
-npm run preview    # serve the built dist/ (a frozen snapshot; rebuild to update)
-npm run check      # type/content checks
+npm run preview    # build, then serve dist/ via wrangler (production-like snapshot)
+npm run check      # type/content checks (includes the schema parity guard)
+npm run deploy     # build + wrangler deploy to Cloudflare Workers
 ```
 
 Common confusion: `npm run dev` reflects your latest edits live. `npm run
-preview` serves a *built snapshot* and will look stale until you `npm run build`
-again. When iterating, use `dev`.
+preview` rebuilds and then serves a *frozen snapshot* — edits made while it
+runs won't appear until you rerun it. When iterating, use `dev`.
 
 The npm registry may be unreachable from some sandboxes; `npm install` must be
 run in an environment with network access.
@@ -50,7 +54,8 @@ run in an environment with network access.
 ```
 src/
   content.config.ts   # the post schema (the content contract) — validated at build
-  content/blog/       # the posts (Markdown). filename = URL slug
+  schema-parity.ts    # compile-time guard: content.config.ts ↔ keystatic.config.ts
+  content/blog/       # the posts (Markdoc .mdoc). filename = URL slug
   layouts/            # page shells: BaseLayout (html/head/header/footer), PostLayout
   components/         # reusable UI: Header (incl. theme toggle), Footer, FormattedDate
   pages/              # routes; file path = URL. index, about, blog/index, blog/[...slug]
@@ -77,6 +82,10 @@ intent and rationale. If code and docs disagree, fix the docs.
 - **Don't break post URLs.** A published post's slug/URL should stay stable.
 - **Validate, don't loosen.** The content schema failing the build on bad
   metadata is a feature; keep it strict.
+- **Changing the post schema? Touch both files.** The fields are declared in
+  `src/content.config.ts` (build validation) *and* `keystatic.config.ts` (the
+  editor). `src/schema-parity.ts` fails `npm run check` if they drift — that
+  error naming a field means the other config still needs the matching change.
 - **Write for a non-JS reader.** Comment the *why*; keep things approachable.
 - **Record decisions.** Made a significant choice? Add an entry to
   `docs/DECISIONS.md`. Changed a contract? Update `docs/SPECIFICATION.md`.

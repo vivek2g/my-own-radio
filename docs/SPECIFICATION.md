@@ -95,12 +95,17 @@ Rationale for each choice lives in `DECISIONS.md`; this is the summary.
 - **Astro** — the site generator. It turns content files plus page templates
   into the static HTML. Chosen for being content-first and for letting us add
   interactive pieces only where needed (see "islands" in `ARCHITECTURE.md`).
-- **Markdown** — the format posts are written in: plain text with light syntax
-  for headings, links, etc. Readable, portable, diff-friendly in Git.
+- **Markdoc** — the format posts are written in (`.mdoc` files): plain text
+  with light Markdown-compatible syntax for headings, links, etc. Readable,
+  portable, diff-friendly in Git.
+- **Keystatic** — a visual post editor at `/keystatic`, available only during
+  local dev. It reads and writes the post files on disk; it is an editing
+  convenience, not a backend — Git stays the source of truth.
 - **Git + GitHub** — version control and the single source of truth for all
   content and code.
-- **Cloudflare Pages** — the host. It watches the GitHub repo, runs the build
-  on every push, and serves the result on a global CDN for free.
+- **Cloudflare Workers** — the host. The built static files are deployed as a
+  Worker that serves them from a global CDN for free (config in
+  `wrangler.jsonc`; deployed via `npm run deploy` or Workers Builds on push).
 - **Node.js** — the runtime needed to *build* the site locally and on the host.
   The pinned version lives in `.nvmrc`.
 
@@ -131,8 +136,8 @@ links and search rankings don't break.
 
 ## 6. Content model (the contract for a post)
 
-This is the most important contract in the system. Every post is a Markdown file
-in `src/content/blog/`. The filename (minus `.md`) becomes the URL slug.
+This is the most important contract in the system. Every post is a Markdoc file
+in `src/content/blog/`. The filename (minus `.mdoc`) becomes the URL slug.
 
 Each post begins with **frontmatter** — a small block of metadata at the top of
 the file. The schema is enforced at build time (defined in
@@ -158,8 +163,11 @@ the file. The schema is enforced at build time (defined in
 - Listings are sorted by `pubDate`, newest first.
 
 This schema is the natural extension point for future metadata (e.g. a
-`heroImage`, `series`, or `audioUrl` field for the radio phase) — add a field
-here and every consumer can rely on it.
+`series` or `audioUrl` field for the radio phase) — add a field here and every
+consumer can rely on it. The Keystatic editor declares the same fields in
+`keystatic.config.ts`; a compile-time guard (`src/schema-parity.ts`) fails
+`npm run check` if the two ever declare different fields, so schema changes
+must touch both files.
 
 ---
 
@@ -260,8 +268,9 @@ feature genuinely cannot be static.
   of static files. A *preview* of that build is a frozen snapshot — it only
   updates when rebuilt. (Confusing the two is a common trap: edits don't appear
   in a stale preview build.)
-- **Deployment:** Cloudflare Pages rebuilds from the `main` branch on every push
-  and serves the result. Exact build settings live in `README.md`.
+- **Deployment:** the built `dist/` is deployed to Cloudflare Workers with
+  wrangler (`npm run deploy`, or Workers Builds building `main` on push).
+  Exact settings live in `wrangler.jsonc` and `README.md`.
 - **Secrets/keys:** none required for Phase 1. Future phases that need API keys
   (e.g. an embedding model) must use environment variables, never committed to
   Git.
@@ -272,7 +281,7 @@ feature genuinely cannot be static.
 
 An implementation satisfies this spec if:
 
-1. Adding a Markdown file with valid frontmatter to the posts folder makes a new
+1. Adding a Markdoc file with valid frontmatter to the posts folder makes a new
    post page appear, listed newest-first on home and journal pages.
 2. A `draft: true` post is absent from the live build.
 3. Invalid frontmatter fails the build.
@@ -282,7 +291,8 @@ An implementation satisfies this spec if:
 5. Light and dark themes both render with readable contrast; the site follows
    the device by default and honors a remembered manual toggle with no flash.
 6. Every page has a title, description, canonical URL, and social-preview tags.
-7. The production build is fully static and hosts for free on Cloudflare Pages.
+7. The production build is fully static (no editor routes, no React) and hosts
+   for free on Cloudflare Workers.
 
 ---
 
