@@ -64,8 +64,8 @@ static page each. The post body is rendered via `render()` from `astro:content`.
   tags). Every page wraps its content in this.
 - `layouts/PostLayout.astro` — adds the post title, date, and tags around the
   article body.
-- `components/` — small reusable pieces (`Header`, `Footer`, `FormattedDate`,
-  `Search`).
+- `components/` — small reusable pieces (`Header`, `Sidebar`, `Footer`,
+  `FormattedDate`, `Search`, `PostList`).
 
 ## Styling
 
@@ -102,6 +102,28 @@ produces the same pure static output as before.
 The editor's schema (`keystatic.config.ts`) mirrors the content schema
 (`src/content.config.ts`). `src/schema-parity.ts` asserts at type-check time
 that the two declare the same fields, so `npm run check` fails if they drift.
+
+## Sections (categories)
+
+`src/lib/categories.ts` is the single source of truth for the site's sections.
+Four things read from it, which is why adding a section is a one-line change:
+
+- the post schema (`src/content.config.ts`) turns the slugs into a Zod enum, so
+  an unknown category fails the build;
+- the Keystatic editor (`keystatic.config.ts`) turns them into a dropdown;
+- the left rail (`src/components/Sidebar.astro`) renders one link each;
+- `src/pages/[category].astro` generates one page each, filtering posts by
+  their `category` field.
+
+Because `getStaticPaths()` only ever emits the known slugs, that dynamic route
+sits at the URL root without shadowing real pages like `/about/`.
+
+## Page shell
+
+`BaseLayout` is a two-column CSS grid: the section rail, then the page content.
+Below 900px the grid collapses to one column and the rail restyles itself into
+a horizontal scrolling strip above the content — same markup and same links, no
+hidden menu to open and no JavaScript involved.
 
 ## Search (a worked example of "complexity at the edges")
 
@@ -172,7 +194,7 @@ Pages (routes)          src/pages/        — what URLs exist; fetch content
    │
 Layouts                 src/layouts/      — page shells (Base, Post)
    │
-Components              src/components/    — reusable UI (Header, Footer, FormattedDate, Search)
+Components              src/components/    — reusable UI (Header, Sidebar, PostList, Footer, …)
    │
 Content + tokens        src/content/, src/styles/  — the data and the design vars
 ```
@@ -212,9 +234,11 @@ widget = a component. This keeps edits local and predictable.
 - **Give a post a photo:** add an image to `public/images/`, then set
   `heroImage: "/images/your-file.jpg"` (and `heroAlt`) in the post's frontmatter.
   It appears on the post page and as the homepage thumbnail/lead image.
-- **Add a nav link:** edit the `links` array in `src/components/Header.astro`.
-- **Add a new top-level section:** add a page in `src/pages/`, then link to it
-  from the header.
+- **Add a reading section (Stories/Treks/…):** add an entry to
+  `src/lib/categories.ts`. Its nav link, its page, and the editor's dropdown all
+  follow automatically.
+- **Add a one-off page (not a section):** add a file in `src/pages/`, then add
+  it to `secondaryLinks` in `src/components/Sidebar.astro`.
 
 ## Why these boundaries matter as the project grows
 

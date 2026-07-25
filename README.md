@@ -56,6 +56,7 @@ You can also write a post by hand:
    ---
    title: "Your post title"
    description: "One or two sentences. Used for SEO and post previews."
+   category: "treks"
    pubDate: 2026-06-21
    tags: ["trek", "himalaya"]
    draft: false
@@ -66,6 +67,8 @@ You can also write a post by hand:
 
    - `title` (required) — the headline.
    - `description` (required) — short summary shown on list pages.
+   - `category` (required) — which section it belongs to: `stories`, `treks`,
+     or `philosophy`. The list lives in `src/lib/categories.ts`.
    - `pubDate` (required) — `YYYY-MM-DD`.
    - `updatedDate` (optional) — set if you revise a published post.
    - `tags` (optional) — list of strings; defaults to empty.
@@ -134,6 +137,7 @@ explain *what* and *why*.** If they ever disagree, fix the docs.
 ├── src/
 │   ├── content.config.ts  # post schema (typed frontmatter)
 │   ├── schema-parity.ts   # compile-time guard: the two schemas above must match
+│   ├── lib/               # categories (the site's sections) + shared post queries
 │   ├── content/blog/      # the posts (Markdoc .mdoc files)
 │   ├── layouts/           # page shells (Base, Post)
 │   ├── components/        # reusable UI (Header, Footer, dates)

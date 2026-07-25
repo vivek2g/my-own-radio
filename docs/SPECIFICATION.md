@@ -132,7 +132,12 @@ URL).
 | Journal | `/blog/` | Full list of published posts (with thumbnails), newest first |
 | Post | `/blog/<slug>/` | A single post; one page generated per post |
 | About | `/about/` | Who the author is and what the project is |
+| Section | `/<category>/` | One page per section (`/stories/`, `/treks/`, `/philosophy/`), listing that section's posts |
 | Search index | `/search-index.json` | Build-time data file the header's search panel fetches; not a page |
+
+Sections are generated from `src/lib/categories.ts`; adding one there adds its
+page and its nav entry. Because that list is fixed, the dynamic `[category]`
+route can never shadow a real page such as `/about/`.
 
 `<slug>` is the post's URL-safe identifier, derived from its filename. URLs are
 intended to be **stable** — once published, a post's URL should not change, so
@@ -153,6 +158,7 @@ the file. The schema is enforced at build time (defined in
 | --- | --- | --- |
 | `title` | yes | The post's headline |
 | `description` | yes | One–two sentence summary; used in lists and social previews |
+| `category` | yes | Which section the post belongs to; one of the slugs in `src/lib/categories.ts` |
 | `pubDate` | yes | Publication date (`YYYY-MM-DD`) |
 | `updatedDate` | no | Date of a later revision |
 | `tags` | no | List of topic labels; defaults to empty |

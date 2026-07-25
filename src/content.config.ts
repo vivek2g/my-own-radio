@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { CATEGORY_SLUGS } from './lib/categories';
 
 // A "content collection" is a typed group of content files.
 // Astro validates every post's frontmatter against this schema at build time,
@@ -14,6 +15,10 @@ import { glob } from 'astro/loaders';
 export const blogSchema = z.object({
   title: z.string(),
   description: z.string(),
+  // Which section of the site the post belongs to. Required and restricted to
+  // the slugs in src/lib/categories.ts, so a typo fails the build rather than
+  // quietly dropping the post out of every section listing.
+  category: z.enum(CATEGORY_SLUGS),
   pubDate: z.coerce.date(),
   updatedDate: z.coerce.date().optional(),
   // Free-form tags, e.g. ["trek", "himalaya", "philosophy"]
