@@ -9,8 +9,10 @@ import { glob } from 'astro/loaders';
 //
 // Docs: https://docs.astro.build/en/guides/content-collections/
 const blog = defineCollection({
-  // Load every Markdown file under src/content/blog/ as an entry.
-  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  // Load every Markdoc file under src/content/blog/ as an entry.
+  // (Posts are authored in Keystatic, which saves them as .mdoc — a
+  // markdown-compatible format rendered by the @astrojs/markdoc integration.)
+  loader: glob({ pattern: '**/*.mdoc', base: './src/content/blog' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
