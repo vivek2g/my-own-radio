@@ -38,15 +38,19 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Space+Grotesk:wght@500;600;700&display=swap"
     />
-    <!-- Apply the saved theme before paint so there's no flash of the wrong
-         colors. Runs only if the visitor previously chose a theme; otherwise
-         the site follows the device setting. -->
+    <!-- Apply saved preferences before paint, so there's no flash of the wrong
+         colors or of a section rail that's about to collapse. This has to run
+         here rather than in a component: every link is a full page load, so
+         without it each navigation would briefly show the default state. -->
     <script is:inline>
       (function () {
         try {
           var t = localStorage.getItem('theme');
           if (t === 'light' || t === 'dark') {
             document.documentElement.setAttribute('data-theme', t);
+          }
+          if (localStorage.getItem('rail') === 'collapsed') {
+            document.documentElement.setAttribute('data-rail', 'collapsed');
           }
         } catch (e) {}
       })();
@@ -93,6 +97,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       gap: 0 1.5rem;
       padding-inline: clamp(1.1rem, 4vw, 2.75rem);
       padding-top: 1.75rem;
+    }
+    /* Rail hidden (see Sidebar.astro): the content takes the whole width. */
+    :root[data-rail='collapsed'] .shell {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'main';
     }
   }
 </style>

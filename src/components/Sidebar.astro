@@ -4,7 +4,8 @@
 // post schema or the category pages.
 //
 // Below --sidebar-breakpoint the rail becomes a horizontal, scrollable strip
-// that sits above the content — the same links, no hidden menu to open.
+// that sits above the content — the same links, just laid out in a row.
+// The header's hamburger can hide it entirely at any width.
 import { CATEGORIES } from '../lib/categories';
 
 interface Props {
@@ -38,7 +39,7 @@ const isCurrent = (href: string) => {
 };
 ---
 
-<aside class="rail font-ui">
+<aside id="section-rail" class="rail font-ui">
   <nav aria-label="Sections">
     <ul>
       {links.map((link) => (
@@ -70,6 +71,12 @@ const isCurrent = (href: string) => {
 <style>
   .rail {
     grid-area: rail;
+  }
+  /* Hidden by the header's hamburger. One rule covers both layouts — the
+     desktop column and the mobile strip. The attribute is set on <html> before
+     paint (see BaseLayout) so it survives navigation without flashing. */
+  :root[data-rail='collapsed'] .rail {
+    display: none;
   }
   .rail ul {
     list-style: none;
