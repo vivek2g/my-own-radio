@@ -5,12 +5,12 @@
 */
 
 :root {
-  --color-bg: #f0e9d8;          /* warm sepia / cream */
-  --color-surface: #f7f1e3;     /* lighter cream for header/cards */
-  --color-text: #221f1a;        /* warm ink */
-  --color-muted: #847b65;       /* warm muted */
+  --color-bg: #ffffff;          /* clean white page */
+  --color-surface: #fafafa;     /* barely-there grey for header/rails */
+  --color-text: #1a1a1a;        /* near-black ink */
+  --color-muted: #6b6b6b;       /* grey secondary text */
   --color-accent: #3a6b4e;      /* forest green */
-  --color-border: #e1d8c3;      /* warm hairline */
+  --color-border: #e6e6e6;      /* neutral hairline */
 
   /* Display grotesque (headlines), reading serif (Newsreader, body),
      UI sans (Inter, small labels). */
@@ -29,6 +29,12 @@
   --max-width: 40rem;   /* ~66-character reading measure */
   --space: 1rem;
   --radius: 10px;
+
+  /* Layout: the fixed left section rail, and the width below which it turns
+     into a horizontal strip above the content. */
+  --sidebar-width: 13rem;
+  --sidebar-breakpoint: 900px;
+  --header-height: 3.9rem;
 }
 
 /* Dark theme tokens.
@@ -37,21 +43,21 @@
    2. The visitor explicitly chose dark via the header toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --color-bg: #1a1813;
-    --color-surface: #221f17;
-    --color-text: #ece6d6;
-    --color-muted: #a59c84;
+    --color-bg: #121212;
+    --color-surface: #1c1c1c;
+    --color-text: #ededed;
+    --color-muted: #a0a0a0;
     --color-accent: #8fbf9f;
-    --color-border: #34301f;
+    --color-border: #2e2e2e;
   }
 }
 :root[data-theme='dark'] {
-  --color-bg: #1a1813;
-  --color-surface: #221f17;
-  --color-text: #ece6d6;
-  --color-muted: #a59c84;
+  --color-bg: #121212;
+  --color-surface: #1c1c1c;
+  --color-text: #ededed;
+  --color-muted: #a0a0a0;
   --color-accent: #8fbf9f;
-  --color-border: #34301f;
+  --color-border: #2e2e2e;
 }
 
 * {

@@ -2,17 +2,22 @@
 // The base HTML shell every page uses: <head>, header, slot, footer.
 // Pass `title` and `description` props per page for SEO and the browser tab.
 import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description?: string;
+  // Which section the page belongs to, for the rail's active state. Pages that
+  // live at a rail URL can leave this unset — the rail matches on the URL.
+  activeSection?: string;
 }
 
 const {
   title,
   description = 'A personal journal of treks, travel, and philosophical & spiritual reflection.',
+  activeSection,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -57,9 +62,37 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <Header />
-    <main>
-      <slot />
-    </main>
+    <!-- Two-column shell: the section rail, then the page content. Below the
+         sidebar breakpoint the grid collapses to one column and the rail
+         becomes a horizontal strip above the content. -->
+    <div class="shell">
+      <Sidebar activeSection={activeSection} />
+      <main class="shell__main">
+        <slot />
+      </main>
+    </div>
     <Footer />
   </body>
 </html>
+
+<style>
+  .shell {
+    display: grid;
+    grid-template-areas: 'rail' 'main';
+  }
+  .shell__main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      grid-template-areas: 'rail main';
+      align-items: start;
+      gap: 0 1.5rem;
+      padding-inline: clamp(1.1rem, 4vw, 2.75rem);
+      padding-top: 1.75rem;
+    }
+  }
+</style>
