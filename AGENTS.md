@@ -57,7 +57,7 @@ src/
   schema-parity.ts    # compile-time guard: content.config.ts ↔ keystatic.config.ts
   content/blog/       # the posts (Markdoc .mdoc). filename = URL slug
   layouts/            # page shells: BaseLayout (html/head/header/footer), PostLayout
-  components/         # reusable UI: Header (incl. theme toggle), Footer, FormattedDate
+  components/         # reusable UI: Header (incl. theme toggle), Search, Footer, FormattedDate
   pages/              # routes; file path = URL. index, about, blog/index, blog/[...slug]
   styles/global.css   # design tokens (CSS variables) + base styles; light & dark blocks
 public/               # static assets served as-is (favicon, images/)
