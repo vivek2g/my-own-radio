@@ -35,6 +35,9 @@
   --sidebar-width: 13rem;
   --sidebar-breakpoint: 900px;
   --header-height: 3.9rem;
+  /* How long the rail takes to collapse. Shared so the track animation
+     (BaseLayout) and the fade/visibility hand-off (Sidebar) stay in step. */
+  --rail-collapse: 0.28s;
 }
 
 /* Dark theme tokens.
@@ -79,10 +82,18 @@ body {
   margin: 0;
 }
 
+/* The reading column. `margin-inline: auto` centres it in whatever space it is
+   given, so it re-centres by itself when the section rail collapses. */
 .container {
   max-width: var(--max-width);
   margin-inline: auto;
   padding-inline: 1.4rem;
+}
+@media (min-width: 900px) {
+  /* .shell already pads the page edges at this width; don't pad twice. */
+  .container {
+    padding-inline: 0;
+  }
 }
 
 a {

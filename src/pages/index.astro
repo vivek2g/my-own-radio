@@ -18,7 +18,7 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
 ---
 
 <BaseLayout title="My Own Radio">
-  <div class="page">
+  <div class="container">
     {posts.length === 0 ? (
       <p class="page__empty">No posts yet. The first one is on its way.</p>
     ) : (
@@ -54,10 +54,6 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
 </BaseLayout>
 
 <style>
-  .page {
-    max-width: var(--max-width);
-    padding-inline: 1.4rem;
-  }
   .page__empty {
     color: var(--color-muted);
   }
@@ -110,11 +106,5 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
   }
   .more__link {
     margin-top: 1.75rem;
-  }
-
-  @media (min-width: 900px) {
-    .page {
-      padding-inline: 0;
-    }
   }
 </style>

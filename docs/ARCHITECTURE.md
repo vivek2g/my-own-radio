@@ -124,9 +124,13 @@ sits at the URL root without shadowing real pages like `/about/`.
 Below 900px the grid collapses to one column and the rail restyles itself into
 a horizontal scrolling strip above the content — same markup, same links.
 
-The hamburger in the header hides the rail entirely at any width. It sets
-`data-rail="collapsed"` on `<html>`; `Sidebar.astro` hides the rail on that
-attribute and `BaseLayout` drops the grid column, so the article widens. The
+The hamburger in the header hides the rail at any width. It sets
+`data-rail="collapsed"` on `<html>`; `BaseLayout` animates the grid track the
+rail occupies down to zero (the column on desktop, the row on phones) and the
+rail fades and clips itself, so the article reflows into the freed space rather
+than the rail leaving a hole — see `docs/DECISIONS.md` #24. Because the reading
+column is centred with `margin-inline: auto`, it re-centres itself in whatever
+width it ends up with. The
 state is stored in `localStorage` and re-applied by the inline script in
 `<head>` **before first paint** — without that, the rail would reopen on every
 navigation (each link is a full page load) and flash on the way to collapsing.
