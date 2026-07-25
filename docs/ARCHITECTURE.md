@@ -122,8 +122,15 @@ sits at the URL root without shadowing real pages like `/about/`.
 
 `BaseLayout` is a two-column CSS grid: the section rail, then the page content.
 Below 900px the grid collapses to one column and the rail restyles itself into
-a horizontal scrolling strip above the content — same markup and same links, no
-hidden menu to open and no JavaScript involved.
+a horizontal scrolling strip above the content — same markup, same links.
+
+The hamburger in the header hides the rail entirely at any width. It sets
+`data-rail="collapsed"` on `<html>`; `Sidebar.astro` hides the rail on that
+attribute and `BaseLayout` drops the grid column, so the article widens. The
+state is stored in `localStorage` and re-applied by the inline script in
+`<head>` **before first paint** — without that, the rail would reopen on every
+navigation (each link is a full page load) and flash on the way to collapsing.
+See `docs/DECISIONS.md` #23; the theme toggle uses the same mechanism.
 
 ## Search (a worked example of "complexity at the edges")
 
