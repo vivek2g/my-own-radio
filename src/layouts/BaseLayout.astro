@@ -89,19 +89,48 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     min-width: 0;
   }
 
+  /* Collapsing animates the grid track the rail occupies rather than toggling
+     `display`, which cannot be transitioned. The rail clips its own overflow
+     (see Sidebar.astro) so its contents slide away as the track shrinks. */
+
+  /* Phones: the rail is a row above the content, so the row collapses.
+     `1fr -> 0fr` is the trick for animating to and from an unknown height.
+     PRECONDITION: this only sizes the rail row to its content because .shell's
+     height is indefinite. If anything ever gives it a definite height (a
+     `body { min-height: 100vh }` sticky-footer, say), `1fr` would start
+     claiming leftover space and the rail row would balloon. */
+  @media (max-width: 899px) {
+    .shell {
+      grid-template-rows: 1fr auto;
+      transition: grid-template-rows var(--rail-collapse) ease;
+    }
+    :root[data-rail='collapsed'] .shell {
+      grid-template-rows: 0fr auto;
+    }
+  }
+
+  /* Desktop: the rail is a column, so the column width animates to zero and
+     the article widens into the space. */
   @media (min-width: 900px) {
     .shell {
       grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
       grid-template-areas: 'rail main';
       align-items: start;
-      gap: 0 1.5rem;
+      /* No gap: it would survive the collapse as a stray offset. The rail's
+         own nav carries the full spacing instead, and gets clipped with it. */
+      gap: 0;
       padding-inline: clamp(1.1rem, 4vw, 2.75rem);
       padding-top: 1.75rem;
+      transition: grid-template-columns var(--rail-collapse) ease;
     }
-    /* Rail hidden (see Sidebar.astro): the content takes the whole width. */
     :root[data-rail='collapsed'] .shell {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'main';
+      grid-template-columns: 0 minmax(0, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shell {
+      transition: none;
     }
   }
 </style>

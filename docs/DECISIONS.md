@@ -385,3 +385,33 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   JavaScript gets a working site and never sees the toggle — the button stays
   `hidden` until its script runs, the same progressive-enhancement rule the
   search button follows (#20).
+
+## 24. The rail collapse animates a grid track, not `display`
+
+- **Status:** Accepted (refines #23).
+- **Context:** The first version of the collapse used `display: none`, which is
+  not animatable — the rail vanished in one frame and the article jumped.
+- **Decision:** Animate the grid track the rail occupies. On desktop the column
+  goes `var(--sidebar-width) → 0`; on phones the row goes `1fr → 0fr` (the
+  standard trick for animating to and from a content-determined height). The
+  rail sets `overflow: hidden` so its contents are clipped as the track
+  shrinks, and fades via opacity. Duration lives in one token,
+  `--rail-collapse`, shared by both files.
+- **Why:** Grid track sizes interpolate; `display` does not. Animating the
+  track (rather than translating the rail out of view) means the article
+  genuinely reflows into the freed space instead of the rail leaving a hole.
+- **Consequences worth knowing:**
+  - **Spacing moved inside the rail.** The grid `gap` had to go, because a gap
+    survives its collapsed track as a stray offset. All 2.5rem of rail-to-article
+    spacing is now `padding-right` on `.rail nav`, inside the clipped box.
+  - **`visibility: hidden` is delayed** by the full collapse duration, so the
+    links leave the tab order only once they are actually gone. The toggle
+    additionally pulls focus back to itself when it hides a rail that currently
+    holds focus — otherwise the browser drops focus to `<body>` and a keyboard
+    user is silently returned to the top of the document.
+  - **The mobile `1fr` row depends on `.shell` having an indefinite height.**
+    Giving it a definite height (e.g. a `min-height: 100vh` sticky footer)
+    would make `1fr` claim leftover space and the rail row would balloon. Noted
+    in a comment at the rule.
+  - `prefers-reduced-motion` drops both transitions, leaving the instant
+    behaviour that #23 shipped.
