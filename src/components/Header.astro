@@ -131,6 +131,7 @@ import Search from './Search.astro';
   // inline script re-applies before paint on the next page — without that, the
   // rail would reopen on every navigation.
   const railBtn = document.getElementById('rail-toggle');
+  const sectionRail = document.getElementById('section-rail');
 
   if (railBtn) {
     const railCollapsed = () => root.getAttribute('data-rail') === 'collapsed';
@@ -143,6 +144,18 @@ import Search from './Search.astro';
 
     railBtn.addEventListener('click', () => {
       const next = railCollapsed() ? 'shown' : 'collapsed';
+      // If focus is on a link inside the rail we're about to hide, take it to
+      // the button first. Otherwise the browser drops focus to <body> once the
+      // rail turns invisible, silently sending a keyboard user back to the top
+      // of the document with nothing to show for it.
+      if (
+        next === 'collapsed' &&
+        sectionRail &&
+        document.activeElement instanceof Node &&
+        sectionRail.contains(document.activeElement)
+      ) {
+        railBtn.focus();
+      }
       if (next === 'collapsed') {
         root.setAttribute('data-rail', 'collapsed');
       } else {
