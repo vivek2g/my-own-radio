@@ -1,10 +1,12 @@
 ---
-// Home page (option 2: "lead story + list").
-// The newest post leads with its image and a larger headline; the rest follow
-// as compact entries with a small thumbnail.
+// Home page: the newest post leads with a large headline and image, then the
+// rest follow in the standard list (see docs/DECISIONS.md #16 for why the lead
+// keeps its headline-then-image shape rather than text over the photo).
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import PostList from '../components/PostList.astro';
 import { getPublishedPosts } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
 
 const posts = await getPublishedPosts();
 
@@ -16,39 +18,35 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
 ---
 
 <BaseLayout title="My Own Radio">
-  <div class="container home">
+  <div class="page">
     {posts.length === 0 ? (
-      <p class="muted">No posts yet. The first one is on its way.</p>
+      <p class="page__empty">No posts yet. The first one is on its way.</p>
     ) : (
       <>
         <a class="lead" href={`/blog/${lead.id}/`}>
-          <p class="lead__kicker"><span class="sec">Journal</span> &mdash; <FormattedDate date={lead.data.pubDate} /></p>
+          <p class="kicker lead__meta">
+            <span class="lead__cat">{categoryLabel(lead.data.category)}</span>
+            <span aria-hidden="true"> &middot; </span>
+            <FormattedDate date={lead.data.pubDate} />
+          </p>
           <h1 class="lead__title">{lead.data.title}</h1>
-          <img class="lead__img cut-corner" src={lead.data.heroImage ?? DEFAULT_IMAGE} alt={lead.data.heroAlt ?? ''} />
+          <img
+            class="lead__img cut-corner"
+            src={lead.data.heroImage ?? DEFAULT_IMAGE}
+            alt={lead.data.heroAlt ?? ''}
+          />
           <p class="lead__excerpt">{lead.data.description}</p>
         </a>
 
         {restToShow.length > 0 && (
-          <section class="more-section">
-            <h2 class="kicker more-label">More from the journal</h2>
-            <ul class="list">
-              {restToShow.map((post) => (
-                <li>
-                  <a class="row" href={`/blog/${post.id}/`}>
-                    <img class="row__img" src={post.data.heroImage ?? DEFAULT_IMAGE} alt={post.data.heroAlt ?? ''} />
-                    <div class="row__text">
-                      <p class="kicker"><FormattedDate date={post.data.pubDate} /></p>
-                      <h3 class="row__title">{post.data.title}</h3>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <section class="more">
+            <h2 class="kicker more__label">More from the journal</h2>
+            <PostList posts={restToShow} />
           </section>
         )}
 
         {posts.length > restToShow.length + 1 && (
-          <p class="more font-ui"><a href="/blog">See all posts &rarr;</a></p>
+          <p class="more__link font-ui"><a href="/blog/">See all posts &rarr;</a></p>
         )}
       </>
     )}
@@ -56,22 +54,27 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
 </BaseLayout>
 
 <style>
-  /* Lead story = the homepage hero: kicker, big headline, then the image. */
+  .page {
+    max-width: var(--max-width);
+    padding-inline: 1.4rem;
+  }
+  .page__empty {
+    color: var(--color-muted);
+  }
+
+  /* Lead story: kicker, big headline, then the image. */
   .lead {
     display: block;
     color: inherit;
-    margin-top: 3rem;
+    margin-top: 1rem;
   }
   .lead:hover {
     text-decoration: none;
   }
-  .lead__kicker {
-    font-family: var(--font-ui);
-    font-size: var(--step--1);
-    color: var(--color-muted);
+  .lead__meta {
     margin: 0 0 0.5rem;
   }
-  .lead__kicker .sec {
+  .lead__cat {
     color: var(--color-accent);
     font-weight: 500;
   }
@@ -97,69 +100,21 @@ const DEFAULT_IMAGE = '/images/post-default.svg';
     max-width: 40ch;
   }
 
-  /* Secondary list */
-  .more-section {
+  .more {
     margin-top: 3.5rem;
-    padding-top: 2.25rem;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--color-border);
   }
-  .more-label {
-    margin: 0 0 0.5rem;
-  }
-  .list {
-    list-style: none;
-    padding: 0;
-    margin: 0.75rem 0 0;
-  }
-  .row {
-    display: flex;
-    gap: 1.1rem;
-    align-items: center;
-    padding: 1.4rem 0;
-    border-bottom: 1px solid var(--color-border);
-    color: inherit;
-  }
-  .row:hover {
-    text-decoration: none;
-  }
-  .row__img {
-    width: 112px;
-    height: 76px;
-    flex: none;
-    object-fit: cover;
-    border-radius: 6px;
-  }
-  .row__text {
-    min-width: 0;
-  }
-  .row .kicker {
-    margin: 0 0 0.2rem;
-  }
-  .row__title {
-    font-size: var(--step-1);
-    font-weight: 500;
+  .more__label {
     margin: 0;
-    line-height: 1.25;
   }
-  .row:hover .row__title {
-    color: var(--color-accent);
-  }
-
-  .more {
+  .more__link {
     margin-top: 1.75rem;
   }
 
-  /* On phones, stack the thumbnail above the title for breathing room */
-  @media (max-width: 540px) {
-    .row {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.7rem;
-    }
-    .row__img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 16 / 9;
+  @media (min-width: 900px) {
+    .page {
+      padding-inline: 0;
     }
   }
 </style>

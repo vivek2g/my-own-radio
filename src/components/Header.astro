@@ -1,20 +1,13 @@
 ---
-// Site header / primary navigation.
-// Edit the links here to add or rename pages.
+// Slim top bar: brand on the left, tools on the right. Section navigation
+// lives in the left rail (src/components/Sidebar.astro), not here.
 import Search from './Search.astro';
-
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/blog', label: 'Journal' },
-  { href: '/about', label: 'About' },
-];
 ---
 
 <header class="site-header font-ui">
   <div class="bar">
     <a href="/" class="brand"><span class="brand__dot" aria-hidden="true"></span>My Own Radio</a>
-    <nav>
-      {links.map((link) => <a href={link.href}>{link.label}</a>)}
+    <nav aria-label="Site tools">
       <Search />
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"></button>
     </nav>
@@ -38,7 +31,8 @@ const links = [
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-block: 0.85rem;
+    min-height: var(--header-height);
+    padding-block: 0.6rem;
     padding-inline: clamp(1.1rem, 4vw, 2.75rem);
   }
   .brand {
@@ -61,15 +55,7 @@ const links = [
   nav {
     display: flex;
     align-items: center;
-    gap: clamp(0.85rem, 3vw, 1.4rem);
-  }
-  nav a {
-    color: var(--color-muted);
-    font-size: 0.95rem;
-  }
-  nav a:hover {
-    color: var(--color-accent);
-    text-decoration: none;
+    gap: 0.6rem;
   }
 </style>
 

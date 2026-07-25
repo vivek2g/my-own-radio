@@ -1,4 +1,5 @@
 import { config, fields, collection } from '@keystatic/core';
+import { CATEGORIES } from './src/lib/categories';
 
 // Keystatic configuration — the editor's schema. It mirrors the content
 // collection schema in src/content.config.ts. Storage is "local": the editor
@@ -21,13 +22,21 @@ export default config({
       slugField: 'title',
       path: 'src/content/blog/*',
       format: { contentField: 'content' },
-      columns: ['title', 'pubDate'],
+      columns: ['title', 'category', 'pubDate'],
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({
           label: 'Description',
           description: 'One or two sentences, shown in lists and previews.',
           multiline: true,
+        }),
+        // Options come from src/lib/categories.ts, the same list the site nav
+        // and the content schema use.
+        category: fields.select({
+          label: 'Section',
+          description: 'Which part of the site this post belongs to.',
+          options: CATEGORIES.map((c) => ({ label: c.label, value: c.slug })),
+          defaultValue: 'stories',
         }),
         pubDate: fields.date({ label: 'Publish date' }),
         updatedDate: fields.date({

@@ -186,7 +186,8 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 14. "Forest on sepia" palette (supersedes the stone palette of #6)
 
-- **Status:** Accepted (supersedes the palette in #6).
+- **Status:** Superseded by #21 (the sepia background was replaced with white;
+  the forest-green accent survives).
 - **Decision:** Warm cream/sepia backgrounds with a deep forest-green accent and
   warm-ink text; matching dark theme (warm-dark bg, light-green accent).
 - **Why:** Green reads as nature and calm and fits a Himalayan trek/philosophy
@@ -307,3 +308,50 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   library such as Pagefind or Fuse.js (rejected for now: a dependency and a
   bundle for what a dozen lines of filtering do at this size); a server-side
   search endpoint (rejected: violates #2/#7).
+
+## 21. "Ink on white" palette (supersedes the sepia of #14)
+
+- **Status:** Accepted (supersedes the palette in #14).
+- **Context:** The sepia/cream background gave the site a warm, papery feel but
+  read as dated next to the clean editorial sites the author had in mind, and
+  it tinted the trek photography.
+- **Decision:** White page (`#ffffff`) with a near-black ink (`#1a1a1a`), grey
+  secondary text, and neutral hairlines. The **forest-green accent is kept**
+  (#14's one surviving element), as is the light/dark toggle; the dark theme
+  moves from warm-brown to neutral near-black (`#121212`).
+- **Why:** White lets the photographs supply all the colour and makes long-form
+  text maximally legible. Keeping the green preserves the site's identity and
+  means link/accent behaviour, hover states, and the brand dot did not have to
+  be redesigned.
+- **Trade-off:** The site is less distinctive at a glance than the sepia was.
+  That's the intended trade — the photographs, not the background, should be
+  what's memorable.
+
+## 22. Sections: an explicit `category` field and a left nav rail
+
+- **Status:** Accepted.
+- **Context:** With posts spanning treks, travel and philosophy, a single
+  reverse-chronological feed made it hard to read one thread. Tags already
+  existed but overlap (a post can be both `trek` and `reflection`), so they
+  can't decide which section a post belongs to.
+- **Decision:** Add a **required `category`** field to the post schema, drawn
+  from a fixed list in `src/lib/categories.ts` (`stories`, `treks`,
+  `philosophy`). One category per post. That file is the single source of
+  truth: the Zod schema, the Keystatic dropdown, the nav rail, and the
+  generated category pages (`src/pages/[category].astro`) all read from it, so
+  adding a section is a one-line change. Navigation moves from the top bar into
+  a **left rail** (sticky on desktop, a horizontal scrolling strip on phones);
+  the top bar slims to brand, search, and the theme toggle.
+- **Why:** An explicit field means a post's section is a decision the author
+  makes once, in the editor's dropdown, rather than something inferred from
+  tags and liable to change as tags are edited. Required-and-enumerated means a
+  typo or a missing section fails the build (consistent with "validate, don't
+  loosen"). Tags remain free-form for finer topics.
+- **Trade-off:** A post can only live in one section, so a trek essay that is
+  really about philosophy has to pick. Chosen deliberately: a post appearing in
+  two sections makes the nav ambiguous and the reader unsure where they are.
+- **Alternatives:** Deriving sections from tags (rejected: ambiguous for posts
+  tagged both ways, and silently drops posts whose tags map to nothing);
+  multi-category posts (rejected as above); generic tag pages (a good future
+  addition, but it answers a different question — "more like this" rather than
+  "where does this belong").

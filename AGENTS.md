@@ -57,7 +57,8 @@ src/
   schema-parity.ts    # compile-time guard: content.config.ts ↔ keystatic.config.ts
   content/blog/       # the posts (Markdoc .mdoc). filename = URL slug
   layouts/            # page shells: BaseLayout (html/head/header/footer), PostLayout
-  components/         # reusable UI: Header (incl. theme toggle), Search, Footer, FormattedDate
+  lib/                # categories.ts (the site's sections) + posts.ts (shared queries)
+  components/         # reusable UI: Header, Sidebar (sections), PostList, Search, Footer
   pages/              # routes; file path = URL. index, about, blog/index, blog/[...slug]
   styles/global.css   # design tokens (CSS variables) + base styles; light & dark blocks
 public/               # static assets served as-is (favicon, images/)
@@ -86,6 +87,9 @@ intent and rationale. If code and docs disagree, fix the docs.
   `src/content.config.ts` (build validation) *and* `keystatic.config.ts` (the
   editor). `src/schema-parity.ts` fails `npm run check` if they drift — that
   error naming a field means the other config still needs the matching change.
+- **Adding or renaming a section?** Edit `src/lib/categories.ts` only. The
+  schema, the Keystatic dropdown, the nav rail, and the category pages all read
+  from it. Renaming a slug changes that section's URL — see the URL rule above.
 - **Write for a non-JS reader.** Comment the *why*; keep things approachable.
 - **Record decisions.** Made a significant choice? Add an entry to
   `docs/DECISIONS.md`. Changed a contract? Update `docs/SPECIFICATION.md`.

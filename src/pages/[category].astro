@@ -1,0 +1,31 @@
+---
+// One page per section: /stories/, /treks/, /philosophy/.
+// getStaticPaths only emits the slugs in src/lib/categories.ts, so this dynamic
+// route can never shadow a real page like /about/.
+import type { GetStaticPaths } from 'astro';
+import ListingLayout from '../layouts/ListingLayout.astro';
+import { CATEGORIES } from '../lib/categories';
+import { getPublishedPosts } from '../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+
+  return CATEGORIES.map((category) => ({
+    params: { category: category.slug },
+    props: {
+      category,
+      posts: posts.filter((post) => post.data.category === category.slug),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category, posts } = Astro.props;
+---
+
+<ListingLayout
+  heading={category.label}
+  blurb={category.blurb}
+  posts={posts}
+  showCategory={false}
+  activeSection={category.slug}
+/>
