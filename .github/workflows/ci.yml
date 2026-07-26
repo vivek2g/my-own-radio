@@ -19,8 +19,14 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # Before the build: a photo straight off a phone (.heic) is invisible in
+      # every browser, and nothing else here would notice.
+      - run: npm run verify:images
       - run: npm run check
       - run: npm run build
+      # The editor ships to production (DECISIONS #25), so React is in the
+      # build. This fails if it ever reaches a reading page.
+      - run: npm run verify:static
 
   # Deliberately a separate job: it takes seconds, runs in parallel, and a
   # misspelling in a post is a different kind of problem from a broken build —

@@ -2,17 +2,20 @@ import { config, fields, collection } from '@keystatic/core';
 import { CATEGORIES } from './src/lib/categories';
 
 // Keystatic configuration — the editor's schema. It mirrors the content
-// collection schema in src/content.config.ts. Storage is "local": the editor
-// (at /keystatic during `npm run dev`) reads and writes the post files on your
-// disk; you then commit and push to publish.
+// collection schema in src/content.config.ts.
+//
+// Storage is "github": the editor runs on the deployed site at /keystatic,
+// signs you in with GitHub, and saves by committing to this repo through the
+// GitHub API. Anyone with write access to the repo can edit; everyone else
+// only ever sees the published site. Publishing is the same as it always was —
+// a commit lands, the site rebuilds.
 //
 // Body images uploaded in the editor are saved to public/images/posts and
 // written into the post as /images/posts/<file>, so they render with no extra
-// work. The hero image is a path field for now (type or paste a path like
-// /images/post-chaukhamba.jpg); we can upgrade it to an upload field once the
-// editor is confirmed working.
+// work. The hero image is still a path field; it becomes an upload field once
+// the editor is confirmed working end to end.
 export default config({
-  storage: { kind: 'local' },
+  storage: { kind: 'github', repo: 'vivek2g/my-own-radio' },
   ui: {
     brand: { name: 'My Own Radio' },
   },
@@ -47,11 +50,24 @@ export default config({
           label: 'Tags',
           itemLabel: (props) => props.value,
         }),
-        heroImage: fields.text({
-          label: 'Hero image path',
-          description: 'e.g. /images/post-chaukhamba.jpg (leave blank for the default).',
+        // Upload field rather than a typed path, so the editor shows the
+        // picture and you can see which one is attached. Saved into
+        // public/images and written into the post as /images/<file>, matching
+        // where the existing hero photos already live.
+        heroImage: fields.image({
+          label: 'Hero image',
+          directory: 'public/images',
+          publicPath: '/images/',
+          validation: { isRequired: false },
+          description:
+            'Shown wide (16:9) on the post and home page, and as a small square in lists. ' +
+            'Landscape photos work best — a tall photo will be cropped top and bottom. ' +
+            'Leave empty to use the default placeholder.',
         }),
-        heroAlt: fields.text({ label: 'Hero image alt text' }),
+        heroAlt: fields.text({
+          label: 'Hero image alt text',
+          description: 'Describe the photo for readers who cannot see it.',
+        }),
         draft: fields.checkbox({ label: 'Draft (hidden from the site)', defaultValue: false }),
         content: fields.markdoc({
           label: 'Body',

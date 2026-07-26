@@ -16,8 +16,9 @@ deeper context, follow the links in "Documentation map" below.
 
 A personal, reading-first journal website (treks, travel, philosophy), built as
 a **static site** with **Astro**, content authored as **Markdoc** (`.mdoc`)
-files in Git — by hand or via the **Keystatic** editor at `/keystatic` during
-`npm run dev` — and hosted free on **Cloudflare Workers** (static assets). A
+files in Git — by hand or via the **Keystatic** editor at `/keystatic`, which
+runs on the live site as well as locally — and hosted free on **Cloudflare
+Workers** (static assets). A
 later phase adds AI narration / a "radio." The
 guiding qualities: reading-first, owned/portable, simple by default, low-cost,
 understandable by a non-JavaScript author.
@@ -33,7 +34,7 @@ Prerequisites: Node.js at the version in `.nvmrc` (run `nvm use` if you use nvm)
 ```bash
 npm install        # install dependencies (first time, or when deps change)
 npm run dev        # local dev server with hot reload — use this to write/preview
-                   # (also serves the Keystatic editor at /keystatic — dev only)
+                   # (also serves the Keystatic editor at /keystatic)
 npm run build      # produce the static site in dist/
 npm run preview    # build, then serve dist/ via wrangler (production-like snapshot)
 npm run check      # type/content checks (includes the schema parity guard)
@@ -96,7 +97,9 @@ intent and rationale. If code and docs disagree, fix the docs.
 
 ## Guardrails (do not do without explicit human sign-off)
 
-- Do not commit secrets or API keys. Future keys go in environment variables.
+- Do not commit secrets or API keys. The editor's GitHub credentials live in
+  `.env` locally (gitignored) and in Cloudflare for production — never in the
+  repo, which is public. `.env.example` documents the names, never the values.
 - Do not add analytics, trackers, or third-party scripts silently.
 - Do not design any **music** feature assuming a particular catalog is legal to
   use. Music licensing is unresolved and deferred (`docs/DECISIONS.md` #10);

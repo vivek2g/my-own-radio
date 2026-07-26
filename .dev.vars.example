@@ -1,0 +1,11 @@
+# Same values as .env, but for `npm run preview` — which serves the built site
+# through wrangler, i.e. the real Cloudflare runtime. Astro reads `.env`;
+# wrangler reads `.dev.vars`. Copy this to `.dev.vars` (gitignored) if you want
+# the editor to work in a production-like local run.
+#
+# You only need this to test the deployed shape locally. For everyday writing,
+# `npm run dev` plus `.env` is enough.
+
+KEYSTATIC_GITHUB_CLIENT_ID=
+KEYSTATIC_GITHUB_CLIENT_SECRET=
+KEYSTATIC_SECRET=

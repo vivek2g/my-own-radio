@@ -89,15 +89,19 @@ the editorial look. Component-specific styles live in scoped `<style>` blocks
 inside each `.astro` file; a few reading-specific rules (drop cap, blockquote,
 prose rhythm) live in `PostLayout.astro`.
 
-## The editor (Keystatic) — dev-only, files stay the source of truth
+## The editor (Keystatic) — browser-based, files stay the source of truth
 
-Posts can be written in a visual editor, **Keystatic**, served at `/keystatic`
-— but only while `npm run dev` runs. It uses "local" storage: the editor reads
-and writes the `.mdoc` files on your disk, so Git remains the single source of
-truth and publishing is still commit + push. There is no CMS backend, no
-database, and no editor in production: `astro.config.mjs` includes the React +
-Keystatic integrations only when the `dev` command is running, so `astro build`
-produces the same pure static output as before.
+Posts are written in a visual editor, **Keystatic**, served at `/keystatic` —
+on the live site as well as locally (`docs/DECISIONS.md` #25). It uses "github"
+storage: signing in with GitHub proves you have write access to the repo, and
+saving commits the `.mdoc` file through the GitHub API. Git remains the single
+source of truth; an edit is a commit, and the site rebuilds from it.
+
+Two routes are rendered on demand for this — `/keystatic` and
+`/api/keystatic/*` — and nothing else. Every reading page is still prerendered
+and ships no framework JavaScript; the build output confirms no post or listing
+page references the editor bundle. There is no database and no user table:
+authorisation is entirely GitHub's repo permissions.
 
 The editor's schema (`keystatic.config.ts`) mirrors the content schema
 (`src/content.config.ts`). `src/schema-parity.ts` asserts at type-check time

@@ -21,7 +21,8 @@ npm install
 # 2. start the dev server with hot reload
 npm run dev
 # open the URL it prints, usually http://localhost:4321
-# the visual post editor lives at http://localhost:4321/keystatic (dev only)
+# the visual post editor lives at http://localhost:4321/keystatic
+# (it also runs on the deployed site — see "Setting up the editor")
 
 # 3. build the production site into ./dist (what Cloudflare deploys)
 npm run build
@@ -37,10 +38,16 @@ Node version automatically.
 
 ## Writing a post
 
-The easiest way: run `npm run dev` and open **http://localhost:4321/keystatic**
-— a visual editor (Keystatic) that reads and writes the post files on your
-disk. Fill in the fields, write the body, save. The editor only exists in local
-dev; publishing is still just `git commit` + `git push`.
+The easiest way: open **/keystatic** on the site and sign in with GitHub. Fill
+in the fields, write the body, save — saving commits to this repo, and the site
+rebuilds a minute or two later. Only people with write access to the repo can
+get in; everyone else just sees the published site.
+
+It works the same locally at **http://localhost:4321/keystatic** with
+`npm run dev`, which is the more comfortable place to write a long post.
+
+First time only, you need the editor's settings — see
+[Setting up the editor](#setting-up-the-editor) below.
 
 You can also write a post by hand:
 
@@ -84,6 +91,41 @@ A working example lives at `src/content/blog/welcome.mdoc`.
 > `npm run check` if they drift — update both, then run the check.
 
 ---
+
+## Setting up the editor
+
+One-time setup. The editor signs you in with GitHub, which needs a GitHub App —
+Keystatic creates it for you rather than you doing it by hand.
+
+1. Run `npm run dev` and open **http://localhost:4321/keystatic**. With no
+   settings yet, it shows a setup wizard.
+2. Follow it. It creates the GitHub App and shows you four values.
+   - It offers a **deployed URL** field. It's optional, but fill it in with
+     the live site's address (the `site` value in `astro.config.mjs`) or the
+     editor will only work locally. It is *not* asking for a domain you don't
+     own yet — a GitHub App can hold several callback URLs, so when you move
+     to a custom domain you add the new one in the App's settings rather than
+     starting over.
+3. Copy `.env.example` to `.env` and paste them in. `.env` is gitignored —
+   these must never be committed.
+4. Restart `npm run dev`. You should now be able to sign in.
+
+To make it work on the live site too, the same values go to Cloudflare. The
+three secret ones are set from the terminal, which prompts for each value so it
+never lands on disk:
+
+```bash
+npx wrangler secret put KEYSTATIC_GITHUB_CLIENT_ID
+npx wrangler secret put KEYSTATIC_GITHUB_CLIENT_SECRET
+npx wrangler secret put KEYSTATIC_SECRET
+```
+
+The fourth, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`, is **not** secret and is needed
+while the site *builds* rather than while it runs, so it goes in Cloudflare as
+a plain build variable (Workers → your worker → Settings → Variables).
+
+If you move to a custom domain later, update the GitHub App's callback URL to
+match and change `site` in `astro.config.mjs`. That's the whole migration.
 
 ## Deploying to Cloudflare Workers (free tier)
 

@@ -83,7 +83,7 @@ features are **out of scope for Phase 1**. They are not forbidden forever — se
 simple until they're genuinely needed.
 
 Two former non-goals have since been built, both without a server: a **local
-editor** (Keystatic, dev-only — `DECISIONS.md` #17) and **keyword search** over
+editor** (Keystatic, now browser-based — `DECISIONS.md` #25) and **keyword search** over
 post metadata (a build-time index plus a small script — `DECISIONS.md` #20).
 *Semantic* search over post bodies remains future work (`ROADMAP.md` Phase 1.5).
 
@@ -103,9 +103,10 @@ Rationale for each choice lives in `DECISIONS.md`; this is the summary.
 - **Markdoc** — the format posts are written in (`.mdoc` files): plain text
   with light Markdown-compatible syntax for headings, links, etc. Readable,
   portable, diff-friendly in Git.
-- **Keystatic** — a visual post editor at `/keystatic`, available only during
-  local dev. It reads and writes the post files on disk; it is an editing
-  convenience, not a backend — Git stays the source of truth.
+- **Keystatic** — a visual post editor at `/keystatic`, available on the live
+  site and locally. Signing in with GitHub proves write access to the repo;
+  saving commits the post file. It is an editing convenience, not a backend —
+  Git stays the source of truth.
 - **Git + GitHub** — version control and the single source of truth for all
   content and code.
 - **Cloudflare Workers** — the host. The built static files are deployed as a
@@ -283,9 +284,10 @@ feature genuinely cannot be static.
 - **Deployment:** the built `dist/` is deployed to Cloudflare Workers with
   wrangler (`npm run deploy`, or Workers Builds building `main` on push).
   Exact settings live in `wrangler.jsonc` and `README.md`.
-- **Secrets/keys:** none required for Phase 1. Future phases that need API keys
-  (e.g. an embedding model) must use environment variables, never committed to
-  Git.
+- **Secrets/keys:** the editor needs three (`KEYSTATIC_GITHUB_CLIENT_ID`,
+  `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`), held as Cloudflare
+  secrets in production and in a gitignored `.env` locally — never committed.
+  `.env.example` documents the names. Nothing the *reader* sees requires a key.
 
 ---
 
@@ -303,8 +305,9 @@ An implementation satisfies this spec if:
 5. Light and dark themes both render with readable contrast; the site follows
    the device by default and honors a remembered manual toggle with no flash.
 6. Every page has a title, description, canonical URL, and social-preview tags.
-7. The production build is fully static (no editor routes, no React) and hosts
-   for free on Cloudflare Workers.
+7. Every **reading** page is prerendered and ships no framework JavaScript;
+   only the two editor routes (`/keystatic`, `/api/keystatic/*`) render on
+   demand. The site hosts for free on Cloudflare Workers.
 
 ---
 
