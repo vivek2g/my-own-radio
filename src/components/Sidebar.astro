@@ -24,9 +24,13 @@ const links = [
   ...CATEGORIES.map((c) => ({ href: `/${c.slug}/`, label: c.label })),
 ];
 
+// "Admin" is shown to everyone on purpose. It only leads to a GitHub sign-in,
+// so hiding it would buy no security — and hiding it would mean the author
+// couldn't find the editor from a machine they hadn't used before.
 const secondaryLinks = [
   { href: '/blog/', label: 'All posts' },
   { href: '/about/', label: 'About' },
+  { href: '/keystatic', label: 'Admin' },
 ];
 
 // Mark the current section. An explicit activeSection wins; otherwise match on
@@ -113,6 +117,7 @@ const isCurrent = (href: string) => {
     font-weight: 500;
     background: var(--color-surface);
   }
+
 
   /* Desktop: a sticky column that stays put while the article scrolls. */
   @media (min-width: 900px) {
