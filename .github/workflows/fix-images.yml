@@ -1,0 +1,70 @@
+# Makes photos uploaded from the browser editor web-ready, automatically.
+#
+# The editor cannot convert on upload — its UI is prebuilt and not ours to
+# change — so a phone photo arrives as a 5MB .heic that no browser can render.
+# This runs straight after the save, converts it to a sensibly sized JPEG,
+# repoints the post, and commits the result. From the author's side the photo
+# simply works a minute later.
+#
+# No infinite loop: a push made with GITHUB_TOKEN does not trigger further
+# workflow runs. The actor check below is a second belt for anything that
+# might bypass that.
+name: Fix images
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # ImageMagick on the runner has no HEIF delegate, so heif-convert does
+      # the decoding and ImageMagick the resizing (see scripts/fix-images.mjs).
+      - name: Install image tools
+        run: sudo apt-get update && sudo apt-get install -y imagemagick libheif-examples
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - run: node scripts/fix-images.mjs
+
+      - name: Commit anything that changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No image needed fixing."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Make uploaded images web-ready
+
+          Converted camera formats to JPEG and resized anything oversized, so
+          the photo displays and the page stays light. Automated — see
+          .github/workflows/fix-images.yml."
+
+          # Preferred: straight onto main, so the author does nothing at all.
+          if git push; then
+            echo "Pushed the fix to main."
+            exit 0
+          fi
+
+          # Branch protection refused it. Rather than fail and leave a broken
+          # image live, propose the same fix as a PR the author can tap.
+          echo "Direct push refused — opening a pull request instead."
+          BRANCH="auto/fix-images-${GITHUB_SHA::7}"
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "Make uploaded images web-ready" \
+            --body "Automatic: converted camera formats to JPEG and resized oversized photos so they display and load quickly. Raised as a PR because a direct push to \`main\` was refused by branch protection."
