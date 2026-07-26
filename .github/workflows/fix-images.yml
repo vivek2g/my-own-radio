@@ -21,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      # The fallback below opens a PR when a direct push is refused, and
+      # `gh pr create` needs this. Without it the fallback fails too, so a
+      # refused push would leave the broken image published.
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 

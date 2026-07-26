@@ -1,0 +1,17 @@
+# Response headers for the prerendered pages, which Cloudflare serves straight
+# from the CDN without running the worker (see dist/_routes.json). The two
+# editor routes bypass this file and get the same headers from
+# src/middleware.ts instead.
+#
+# Deliberately not a Content-Security-Policy. Every reading page carries three
+# inline scripts (the pre-paint theme/rail script, the theme toggle, search)
+# and loads Google Fonts, so a correct CSP needs per-build hashes regenerated
+# whenever those scripts change — a build step and a standing maintenance
+# obligation. A CSP that silently breaks the theme toggle after a refactor is
+# worse than none. Revisit if the inline scripts ever go away.
+#
+# These three cannot break a page, which is why they're here and a CSP isn't.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

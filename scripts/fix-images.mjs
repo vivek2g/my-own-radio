@@ -92,6 +92,88 @@ async function walk(dir) {
   return out;
 }
 
+// --- Metadata -------------------------------------------------------------
+// Phone photos carry EXIF, which includes GPS coordinates. Publishing a trek
+// location is harmless; publishing the one from a photo taken at home is not,
+// and the author shouldn't have to remember which is which. So every image
+// gets stripped, not just the ones being converted.
+//
+// The catch: rotation also lives in EXIF. Deleting it from a photo shot in
+// portrait would leave it lying on its side. So rotation is baked into the
+// pixels first, and only then is the metadata removed.
+
+// Read the EXIF orientation tag (0x0112). 1 = upright, absent = nothing to do.
+async function readOrientation(file) {
+  const buf = await readFile(file);
+  const app1 = buf.indexOf(Buffer.from([0xff, 0xe1]));
+  if (app1 < 0 || buf.subarray(app1 + 4, app1 + 10).toString() !== 'Exif\0\0') return null;
+  const tiff = app1 + 10;
+  const le = buf.subarray(tiff, tiff + 2).toString() === 'II';
+  const u16 = (o) => (le ? buf.readUInt16LE(o) : buf.readUInt16BE(o));
+  const u32 = (o) => (le ? buf.readUInt32LE(o) : buf.readUInt32BE(o));
+  try {
+    const ifd = tiff + u32(tiff + 4);
+    for (let i = 0; i < u16(ifd); i++) {
+      const entry = ifd + 2 + i * 12;
+      if (u16(entry) === 0x0112) return u16(entry + 8);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+// Remove every APP1 (EXIF) segment. Leaves APP2 alone, so colour profiles
+// survive and the picture doesn't shift hue.
+async function stripExifBytes(file) {
+  const buf = await readFile(file);
+  if (buf.readUInt16BE(0) !== 0xffd8) return false; // not a JPEG
+  const keep = [buf.subarray(0, 2)];
+  let i = 2;
+  let removed = false;
+  while (i < buf.length - 1 && buf[i] === 0xff) {
+    const marker = buf[i + 1];
+    if (marker === 0xda) break; // start of scan: image data from here on
+    const len = buf.readUInt16BE(i + 2);
+    if (marker === 0xe1) removed = true;
+    else keep.push(buf.subarray(i, i + 2 + len));
+    i += 2 + len;
+  }
+  if (!removed) return false;
+  keep.push(buf.subarray(i));
+  await writeFile(file, Buffer.concat(keep));
+  return true;
+}
+
+const ROTATION = { 3: 180, 6: 90, 8: 270 };
+
+async function stripMetadata(file) {
+  if (!['.jpg', '.jpeg'].includes(extname(file).toLowerCase())) return false;
+  const orientation = await readOrientation(file);
+
+  // ImageMagick does rotation and stripping correctly in one pass.
+  if (tools.magick) {
+    const before = (await stat(file)).size;
+    await run(tools.magick, [file, '-auto-orient', '-strip', file]);
+    return (await stat(file)).size !== before || orientation != null;
+  }
+
+  if (orientation && orientation !== 1) {
+    const degrees = ROTATION[orientation];
+    if (!degrees) {
+      console.warn(
+        `  skipped ${relative(ROOT, file)} — mirrored EXIF orientation ` +
+          `${orientation}; install ImageMagick to handle it.`
+      );
+      return false;
+    }
+    if (!tools.sips) return false;
+    await run('sips', ['--rotate', String(degrees), file]);
+  }
+
+  return stripExifBytes(file);
+}
+
 const all = await walk(IMAGES);
 const renames = [];
 let changed = 0;
@@ -133,7 +215,22 @@ for (const file of all.filter((f) => SHRINK.has(extname(f).toLowerCase()))) {
   );
 }
 
-// 3. Point the posts at any new filenames.
+// 3. Strip location and device data from every image, including ones that
+//    needed no other work — a 1MB upright JPEG still carries your GPS.
+for (const file of await walk(IMAGES)) {
+  let stripped = false;
+  try {
+    stripped = await stripMetadata(file);
+  } catch {
+    continue; // unreadable or already removed above
+  }
+  if (stripped) {
+    changed++;
+    console.log(`stripped metadata from ${relative(ROOT, file)}`);
+  }
+}
+
+// 4. Point the posts at any new filenames.
 for (const post of (await walk(POSTS)).filter((f) => f.endsWith('.mdoc'))) {
   let text = await readFile(post, 'utf8');
   const original = text;
