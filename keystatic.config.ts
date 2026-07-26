@@ -50,11 +50,24 @@ export default config({
           label: 'Tags',
           itemLabel: (props) => props.value,
         }),
-        heroImage: fields.text({
-          label: 'Hero image path',
-          description: 'e.g. /images/post-chaukhamba.jpg (leave blank for the default).',
+        // Upload field rather than a typed path, so the editor shows the
+        // picture and you can see which one is attached. Saved into
+        // public/images and written into the post as /images/<file>, matching
+        // where the existing hero photos already live.
+        heroImage: fields.image({
+          label: 'Hero image',
+          directory: 'public/images',
+          publicPath: '/images/',
+          validation: { isRequired: false },
+          description:
+            'Shown wide (16:9) on the post and home page, and as a small square in lists. ' +
+            'Landscape photos work best — a tall photo will be cropped top and bottom. ' +
+            'Leave empty to use the default placeholder.',
         }),
-        heroAlt: fields.text({ label: 'Hero image alt text' }),
+        heroAlt: fields.text({
+          label: 'Hero image alt text',
+          description: 'Describe the photo for readers who cannot see it.',
+        }),
         draft: fields.checkbox({ label: 'Draft (hidden from the site)', defaultValue: false }),
         content: fields.markdoc({
           label: 'Body',

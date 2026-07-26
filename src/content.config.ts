@@ -25,7 +25,9 @@ export const blogSchema = z.object({
   tags: z.array(z.string()).default([]),
   // Optional lead image, shown on the post page and as the homepage
   // thumbnail. Path relative to /public, e.g. "/images/post-chaukhamba.jpg".
-  heroImage: z.string().optional(),
+  // Nullable because Keystatic's upload field writes `null` when cleared,
+  // where a hand-written post simply omits the key.
+  heroImage: z.string().nullable().optional(),
   // Alt text for the image (accessibility). Describe what's in the photo.
   heroAlt: z.string().optional(),
   // Set draft: true to keep a post out of the published site.

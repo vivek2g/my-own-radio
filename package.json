@@ -12,6 +12,8 @@
     "astro": "astro",
     "check": "astro check",
     "verify:static": "node scripts/assert-reader-pages-static.mjs",
+    "verify:images": "node scripts/assert-web-safe-images.mjs",
+    "fix:images": "node scripts/fix-images.mjs",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types"
   },

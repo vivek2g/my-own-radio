@@ -85,9 +85,14 @@ const { title, description, category, pubDate, updatedDate, tags, heroImage, her
   }
 
   .post-hero {
+    display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
+    /* No fixed ratio: the post page shows the photo as it actually is, so a
+       tall or square shot isn't cropped to a letterbox. Capped so a very tall
+       image can't push the article off the screen. */
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
     border-radius: var(--radius);
     margin: 0 0 2rem;
   }
