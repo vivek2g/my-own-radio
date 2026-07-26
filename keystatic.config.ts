@@ -2,17 +2,20 @@ import { config, fields, collection } from '@keystatic/core';
 import { CATEGORIES } from './src/lib/categories';
 
 // Keystatic configuration — the editor's schema. It mirrors the content
-// collection schema in src/content.config.ts. Storage is "local": the editor
-// (at /keystatic during `npm run dev`) reads and writes the post files on your
-// disk; you then commit and push to publish.
+// collection schema in src/content.config.ts.
+//
+// Storage is "github": the editor runs on the deployed site at /keystatic,
+// signs you in with GitHub, and saves by committing to this repo through the
+// GitHub API. Anyone with write access to the repo can edit; everyone else
+// only ever sees the published site. Publishing is the same as it always was —
+// a commit lands, the site rebuilds.
 //
 // Body images uploaded in the editor are saved to public/images/posts and
 // written into the post as /images/posts/<file>, so they render with no extra
-// work. The hero image is a path field for now (type or paste a path like
-// /images/post-chaukhamba.jpg); we can upgrade it to an upload field once the
-// editor is confirmed working.
+// work. The hero image is still a path field; it becomes an upload field once
+// the editor is confirmed working end to end.
 export default config({
-  storage: { kind: 'local' },
+  storage: { kind: 'github', repo: 'vivek2g/my-own-radio' },
   ui: {
     brand: { name: 'My Own Radio' },
   },

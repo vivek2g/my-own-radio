@@ -14,7 +14,7 @@ philosophical reflections.
 
 In scope:
 
-- Static Astro site, Markdoc posts (with a dev-only Keystatic editor),
+- Static Astro site, Markdoc posts (with a browser-based Keystatic editor),
   validated content schema.
 - Home page with typographic masthead + lead-story/list; journal list;
   individual post pages (with lead images); about page.

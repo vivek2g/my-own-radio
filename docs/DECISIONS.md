@@ -57,8 +57,8 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 4. Content as Markdown files in Git (no CMS)
 
-- **Status:** Accepted; refined by #17 (posts are now Markdoc `.mdoc` files,
-  editable via a dev-only local editor — Git remains the source of truth).
+- **Status:** Accepted; refined by #17 and #25 (posts are Markdoc `.mdoc`
+  files, editable in a browser — Git remains the source of truth).
 - **Decision:** Posts are Markdown files in the repo; Git is the source of truth.
 - **Why:** Portable, durable, diff-able, free, and not locked to any vendor. A
   build-time schema validates each post so broken metadata can't ship.
@@ -219,7 +219,9 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 
 ## 17. Keystatic as a local-mode, dev-only editor (refines #4)
 
-- **Status:** Accepted (refines #4 — files in Git remain the source of truth).
+- **Status:** Superseded by #25 (the editor now ships to production in GitHub
+  mode). Its central claim still holds: files in Git remain the source of
+  truth, and the editor is a convenience rather than a backend.
 - **Context:** Writing posts by hand-editing frontmatter is error-prone for a
   non-JS author. A visual editor was wanted without giving up #4's principles
   (no vendor lock-in, no backend, Git as the source of truth).
@@ -285,8 +287,10 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
 - **Context:** Readers needed a way to find a post by keyword. `ROADMAP.md`
   Phase 1.5 anticipates a *semantic* search built on embeddings; this is the
   much smaller first step, and it had to fit the static architecture (#2, #7).
-  Note that React is a dev-only dependency here (#17), so an island framework
-  was not available for production pages anyway.
+  Note that React was a dev-only dependency at the time (#17), so an island
+  framework was not available for production pages anyway. #25 later shipped
+  React to production for the editor, but only the editor route uses it —
+  search remains plain JavaScript, and there is no reason to change that.
 - **Decision:** Generate `/search-index.json` at build time (an Astro endpoint,
   `src/pages/search-index.json.ts`) holding each published post's title,
   description, tags, and URL. The header's `Search.astro` component fetches it
@@ -415,3 +419,39 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
     in a comment at the rule.
   - `prefers-reduced-motion` drops both transitions, leaving the instant
     behaviour that #23 shipped.
+
+## 25. The editor ships to production in GitHub mode (supersedes #17)
+
+- **Status:** Accepted (supersedes #17).
+- **Context:** #17 kept Keystatic dev-only, so editing required a laptop with
+  the repo cloned. The author wanted to fix a typo, swap a photo or add a link
+  from a browser, without that.
+- **Decision:** Ship the editor. `keystatic.config.ts` moves from
+  `storage: { kind: 'local' }` to `{ kind: 'github' }`, and
+  `astro.config.mjs` stops gating the React and Keystatic integrations behind
+  `process.argv.includes('dev')`. Keystatic injects two on-demand routes —
+  `/keystatic` for the admin UI and `/api/keystatic/*` for GitHub auth. Saving
+  commits to this repo through the GitHub API; the site then rebuilds as it
+  always has.
+- **Why this doesn't undo #2 or #7:** the site is still prerendered. Exactly
+  two routes are rendered on demand, both of them the editor, and no reading
+  page depends on a server. That is #7's "complexity at the edges" rather than
+  a violation of it — a static core with an editing island bolted to the side.
+- **Authorisation is GitHub's, not ours.** Whoever has write access to the repo
+  can edit; nobody else. No user table, no password to store, no session
+  system beyond an encrypted cookie holding the GitHub token.
+- **Verified before committing** (a spike on the Workers runtime, not a guess):
+  the admin UI renders and hydrates under `workerd` via `wrangler dev`, and the
+  API route executes — failing only on its own "missing clientId" check.
+  Crucially, **no reading page references the editor bundle**: every post,
+  listing and category page ships the same three inline scripts as before.
+  `dist` grows from 2.1MB to 5.9MB, all of it editor code only an admin loads.
+- **Costs accepted:** an edit is a commit, so publishing waits for a rebuild
+  (a minute or two, not instant — see #20's note on the same trade); the
+  production build now contains React; and `/keystatic` becomes a publicly
+  reachable URL, protected by GitHub login rather than by being unguessable.
+- **Alternatives:** staying dev-only (rejected: the requirement was precisely
+  to edit without a laptop); Keystatic Cloud (rejected for now: paid, and only
+  needed if an editor without GitHub access is ever required); a hand-rolled
+  admin with its own auth (rejected: storing credentials is a liability this
+  project has no reason to take on).

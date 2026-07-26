@@ -11,6 +11,7 @@
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
     "check": "astro check",
+    "verify:static": "node scripts/assert-reader-pages-static.mjs",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types"
   },
