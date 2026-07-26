@@ -20,7 +20,9 @@ const IMAGES = join(ROOT, 'public/images');
 const POSTS = join(ROOT, 'src/content/blog');
 
 const CONVERT = new Set(['.heic', '.heif', '.tif', '.tiff', '.bmp']);
+const SHRINK = new Set(['.jpg', '.jpeg', '.png']);
 const MAX_WIDTH = 2000; // plenty for a full-width hero on a large screen
+const MAX_BYTES = 2_000_000; // above this a phone connection notices
 
 async function walk(dir) {
   const out = [];
@@ -46,10 +48,35 @@ try {
   process.exit(1);
 }
 
-const targets = (await walk(IMAGES)).filter((f) => CONVERT.has(extname(f).toLowerCase()));
+const all = await walk(IMAGES);
+const targets = all.filter((f) => CONVERT.has(extname(f).toLowerCase()));
+
+// Already-web-safe images that are simply too heavy get resized in place —
+// same filename, so nothing needs repointing.
+const oversized = [];
+for (const f of all) {
+  if (!SHRINK.has(extname(f).toLowerCase())) continue;
+  if ((await stat(f)).size > MAX_BYTES) oversized.push(f);
+}
+
+for (const file of oversized) {
+  const before = (await stat(file)).size;
+  await run('sips', [
+    '-s', 'format', 'jpeg',
+    '-s', 'formatOptions', '82',
+    '--resampleWidth', String(MAX_WIDTH),
+    file, '--out', file,
+  ]);
+  const after = (await stat(file)).size;
+  console.log(
+    `resized ${relative(ROOT, file)} ` +
+      `(${(before / 1e6).toFixed(1)}MB -> ${(after / 1e6).toFixed(1)}MB)`
+  );
+}
 
 if (targets.length === 0) {
-  console.log('Nothing to convert — every image is already web-displayable.');
+  if (oversized.length === 0) console.log('Nothing to do — all images are web-ready.');
+  else console.log('\nDone. Run `npm run verify:images` to confirm, then commit.');
   process.exit(0);
 }
 

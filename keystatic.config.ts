@@ -28,10 +28,15 @@ export default config({
       columns: ['title', 'category', 'pubDate'],
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
+        // isRequired mirrors `z.string()` in src/content.config.ts. Without it
+        // the editor happily saves a post the build then rejects — the schema
+        // parity guard only compares field *names*, not whether they're
+        // required, so this pairing has to be kept by hand.
         description: fields.text({
           label: 'Description',
           description: 'One or two sentences, shown in lists and previews.',
           multiline: true,
+          validation: { isRequired: true, length: { min: 1 } },
         }),
         // Options come from src/lib/categories.ts, the same list the site nav
         // and the content schema use.
@@ -41,7 +46,12 @@ export default config({
           options: CATEGORIES.map((c) => ({ label: c.label, value: c.slug })),
           defaultValue: 'stories',
         }),
-        pubDate: fields.date({ label: 'Publish date' }),
+        // Also required by the build schema — an empty date would write null
+        // and fail validation the same way a missing description does.
+        pubDate: fields.date({
+          label: 'Publish date',
+          validation: { isRequired: true },
+        }),
         updatedDate: fields.date({
           label: 'Updated date',
           validation: { isRequired: false },

@@ -88,6 +88,10 @@ intent and rationale. If code and docs disagree, fix the docs.
   `src/content.config.ts` (build validation) *and* `keystatic.config.ts` (the
   editor). `src/schema-parity.ts` fails `npm run check` if they drift — that
   error naming a field means the other config still needs the matching change.
+  **The guard compares field names only, not whether they're required.** If a
+  field is required in Zod, give it `validation: { isRequired: true }` in
+  Keystatic too, by hand — otherwise the editor will happily save a post the
+  build then rejects, and the author finds out from a failed deploy.
 - **Adding or renaming a section?** Edit `src/lib/categories.ts` only. The
   schema, the Keystatic dropdown, the nav rail, and the category pages all read
   from it. Renaming a slug changes that section's URL — see the URL rule above.
