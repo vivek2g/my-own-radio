@@ -1,0 +1,22 @@
+# Spellchecker settings (used by the `spellcheck` job in CI, and by `typos`
+# locally if you install it).
+#
+# WHEN CI FAILS ON A WORD THAT IS ACTUALLY CORRECT — a place name, a Sanskrit
+# or Hindi term, a person's name — add it under [default.extend-words] below,
+# mapping the word to itself. That tells the checker "this spelling is
+# deliberate". Example:
+#
+#   [default.extend-words]
+#   Bugyal = "Bugyal"
+#
+# Prefer adding the specific word over switching the check off; the point is to
+# catch "teh" and "recieve", and a growing list of real words costs nothing.
+#
+# The checker only flags known misspellings, so most proper nouns already pass
+# untouched — Chaukhamba, Madhyamaheshwar and Vedanta all do today.
+
+[default.extend-words]
+
+[files]
+# Generated or vendored trees. (Anything in .gitignore is skipped already.)
+extend-exclude = ["package-lock.json"]

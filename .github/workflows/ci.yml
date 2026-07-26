@@ -1,6 +1,7 @@
 # CI: catches what `npm run check` catches — type errors, bad frontmatter,
-# and post-schema drift (src/schema-parity.ts) — plus build breakage, on every
-# push and pull request, so mistakes surface before they reach main.
+# and post-schema drift (src/schema-parity.ts) — plus build breakage and
+# misspellings, on every push and pull request, so mistakes surface before they
+# reach main.
 name: CI
 
 on:
@@ -20,3 +21,13 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+
+  # Deliberately a separate job: it takes seconds, runs in parallel, and a
+  # misspelling in a post is a different kind of problem from a broken build —
+  # keeping them apart makes the red check say which one it is.
+  spellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check spelling in posts, code and docs
+        uses: crate-ci/typos@v1.48.0
