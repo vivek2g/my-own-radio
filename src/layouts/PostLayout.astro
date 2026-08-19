@@ -5,6 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import { categoryLabel } from '../lib/categories';
+import { slugifyTag, tagLabel } from '../lib/tags';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -29,7 +30,9 @@ const { title, description, category, pubDate, updatedDate, tags, heroImage, her
       {description && <p class="dek">{description}</p>}
       {tags.length > 0 && (
         <ul class="tags font-ui">
-          {tags.map((tag) => <li>#{tag}</li>)}
+          {tags.map((tag) => (
+            <li><a href={`/tags/${slugifyTag(tag)}/`}>#{tagLabel(tag)}</a></li>
+          ))}
         </ul>
       )}
     </header>
@@ -75,13 +78,26 @@ const { title, description, category, pubDate, updatedDate, tags, heroImage, her
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .tags li {
+  .tags a {
+    display: inline-block;
     font-family: var(--font-ui);
     font-size: var(--step--1);
     color: var(--color-muted);
     border: 1px solid var(--color-border);
     padding: 0.15rem 0.6rem;
     border-radius: 999px;
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .tags a:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    text-decoration: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tags a {
+      transition: none;
+    }
   }
 
   .post-hero {

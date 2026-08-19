@@ -455,3 +455,31 @@ Format is lightweight on purpose. Status values: **Accepted**, **Provisional**
   needed if an editor without GitHub access is ever required); a hand-rolled
   admin with its own auth (rejected: storing credentials is a liability this
   project has no reason to take on).
+
+## 26. Tag pages group by a slugified, case-folded key
+
+- **Status:** Accepted.
+- **Context:** Tags are free-form strings (`tags: z.array(z.string())`, no
+  enum) typed by whoever writes a post, including through the Keystatic
+  editor. Turning them into clickable links to a `/tags/<tag>/` archive page
+  raises a question the schema doesn't answer: what makes two tags "the same"
+  tag? A naive one-URL-per-literal-string approach also breaks outright on at
+  least one real tag already in the content: `#thewalk`, which contains a
+  literal `#` — unescaped, that character is a URL fragment separator, not a
+  path segment.
+- **Decision:** `src/lib/tags.ts` groups posts by a slugified key
+  (lowercased, whitespace turned to hyphens, everything outside `[a-z0-9-]`
+  stripped) rather than the literal tag string. Tags that slugify to the same
+  key — differing only in case, a stray `#`, or spacing — collapse into one
+  page. The displayed label strips a leading `#` (`tagLabel()`) since every
+  render site already prepends its own, then keeps the first-seen spelling
+  for that slug (posts are processed newest-first, so the newest post's
+  spelling wins a tie).
+- **Why:** The alternative — one page per exact string — would silently
+  fragment a tag into multiple near-duplicate pages the moment someone typed
+  `Trek` instead of `trek`, with no build-time signal that anything went
+  wrong. Folding by slug makes that class of typo harmless instead of a
+  silent content bug, at the cost of an editor being mildly surprised their
+  new tag's casing didn't "stick" as its own page if it collides with an
+  existing one — an acceptable trade given tags aren't a controlled
+  vocabulary and nothing else depends on exact tag casing today.

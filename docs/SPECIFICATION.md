@@ -134,6 +134,7 @@ URL).
 | Post | `/blog/<slug>/` | A single post; one page generated per post |
 | About | `/about/` | Who the author is and what the project is |
 | Section | `/<category>/` | One page per section (`/stories/`, `/treks/`, `/philosophy/`), listing that section's posts |
+| Tag | `/tags/<tag>/` | One page per tag, listing every post carrying it |
 | Search index | `/search-index.json` | Build-time data file the header's search panel fetches; not a page |
 
 Sections are generated from `src/lib/categories.ts`; adding one there adds its
