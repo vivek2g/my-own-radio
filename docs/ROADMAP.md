@@ -39,12 +39,13 @@ Already done: **keyword search** in the header — a build-time index plus a sma
 script, no server (`DECISIONS.md` #20). It matches titles, descriptions, and
 tags; matching post *bodies* is left to the embeddings work below. Also done:
 **tag pages** (`/tags/<tag>/`) — each tag on a post links to a page listing
-every post that carries it (`DECISIONS.md` #26).
+every post that carries it (`DECISIONS.md` #26). Also done: **RSS feed**
+(`/rss.xml`) and **sitemap** (`/sitemap-index.xml`), both generated at build
+time, no server.
 
 Candidates (pick deliberately, don't build all):
 
 - Per-post hero images and image handling (captions, optimized images).
-- RSS feed and sitemap (cheap, high value for a writing site).
 - **AI content pipeline (headline feature):** an offline/build-time step that
   reads the posts and produces derived data — auto-summaries, suggested
   tags, and an **embeddings index** powering a "related reflections" search.
