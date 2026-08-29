@@ -115,12 +115,25 @@ Beyond defects, suggest improvements that keep the codebase clean as it grows.
 Judge against the repo's own principles:
 - Reuse before new code — an existing component/utility that should have been
   used instead of a near-duplicate.
+- Fewer files, not more. Before a new file is accepted, ask whether it earns
+  its own place or belongs in one that already exists — added behaviour for the
+  header belongs in `Header.astro`, not in a new component beside it. A file is
+  worth splitting out when it is genuinely reused across pages or is a distinct
+  layer concern; it is not worth splitting out merely because the existing file
+  grew. Flag a new file whose contents would sit naturally in a file the diff
+  already touches, and say which of the two cases you think it is. The tree is
+  read far more often than it is written, and every extra hop is one more place
+  to look when debugging.
 - Layer boundaries: pages → layouts → components → content/tokens; changes
   should stay in their layer (`docs/ARCHITECTURE.md`).
 - Complexity belongs at the edges: build-time steps and small islands, never
   turning the static site into a server app (`docs/DECISIONS.md` #7).
-- Components small and single-purpose; shared styles in `global.css`,
-  component styles scoped.
+- Components small and single-purpose — that is about what a component *does*,
+  not about how many files exist. It is never a reason to copy logic into a
+  second place so each copy stays small, and never a reason to open a new file
+  for behaviour that belongs in the one it extends. A component earns its own
+  file when something else renders it; until then it stays where it is used.
+  Shared styles in `global.css`, component styles scoped.
 - Comments explain the *why* for a non-JS reader (`docs/CONTRIBUTING.md`).
 Keep these clearly labeled as suggestions, separate from defects.
 

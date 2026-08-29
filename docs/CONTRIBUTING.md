@@ -38,8 +38,13 @@ See the README's "Writing a post" section. Rules of thumb:
 ## Code conventions
 
 - Run `npm run check` before committing to catch type/content errors.
-- Keep components small and single-purpose; put shared styles in
-  `global.css`, component-specific styles in the component's `<style>` block.
+- Keep components small and single-purpose — that is about what a component
+  *does*, not about how many files exist. Don't copy logic into a second place
+  so each copy stays small, and don't add a file for behaviour that belongs in
+  the one it extends: new functionality for the header goes in `Header.astro`.
+  A component earns its own file once something else renders it.
+- Put shared styles in `global.css`, component-specific styles in the
+  component's `<style>` block.
 - Prefer Astro components for static UI. Only reach for a React/Svelte island
   when something genuinely needs interactivity in the browser.
 - Comment the *why*, not the *what*. The code already says what it does.
