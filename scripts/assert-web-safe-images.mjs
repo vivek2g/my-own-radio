@@ -10,9 +10,10 @@
 // Two things are verified:
 //   1. Every file under public/images uses a format browsers can render.
 //   2. Every heroImage a post refers to actually exists on disk.
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { join, relative, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MAX_BYTES, walk } from './shared.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const IMAGES = join(ROOT, 'public/images');
@@ -22,24 +23,6 @@ const POSTS = join(ROOT, 'src/content/blog');
 const WEB_SAFE = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.svg']);
 // Common camera/scanner formats that look fine on a Mac and break on the web.
 const KNOWN_BAD = new Set(['.heic', '.heif', '.tif', '.tiff', '.bmp', '.raw', '.cr2', '.nef', '.dng']);
-// Anything over this is slow on a phone connection, even if it renders.
-const MAX_BYTES = 2_000_000;
-
-async function walk(dir) {
-  const out = [];
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const e of entries) {
-    const p = join(dir, e.name);
-    if (e.isDirectory()) out.push(...(await walk(p)));
-    else out.push(p);
-  }
-  return out;
-}
 
 const problems = [];
 const warnings = [];
