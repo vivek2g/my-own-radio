@@ -13,12 +13,13 @@
 // has `sips` built in and reads HEIC natively; the Linux CI runner uses
 // ImageMagick, with `heif-convert` as a fallback when ImageMagick was built
 // without HEIF support.
-import { readdir, readFile, writeFile, stat, unlink, rename } from 'node:fs/promises';
+import { readFile, writeFile, stat, unlink, rename } from 'node:fs/promises';
 import { join, relative, extname, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { tmpdir } from 'node:os';
+import { MAX_BYTES, walk } from './shared.mjs';
 
 const run = promisify(execFile);
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
@@ -28,7 +29,6 @@ const POSTS = join(ROOT, 'src/content/blog');
 const CONVERT = new Set(['.heic', '.heif', '.tif', '.tiff', '.bmp']);
 const SHRINK = new Set(['.jpg', '.jpeg', '.png']);
 const MAX_WIDTH = 2000; // plenty for a full-width hero on a large screen
-const MAX_BYTES = 2_000_000; // above this a phone connection notices
 const QUALITY = 82;
 
 async function has(cmd) {
@@ -74,22 +74,6 @@ async function toJpeg(src, dest) {
     await run(tools.magick, [staged, ...resize, dest]);
     await unlink(staged).catch(() => {});
   }
-}
-
-async function walk(dir) {
-  const out = [];
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const e of entries) {
-    const p = join(dir, e.name);
-    if (e.isDirectory()) out.push(...(await walk(p)));
-    else out.push(p);
-  }
-  return out;
 }
 
 // --- Metadata -------------------------------------------------------------
